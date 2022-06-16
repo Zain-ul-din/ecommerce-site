@@ -1,16 +1,128 @@
-html,
+
 body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    padding: 1rem !important;
+    overflow-x: scroll !important;
+    max-width: 100%;
+    border: 1px solid rgba(0,0,0,.1);
+}
+
+.carousel_img {
+    height: 50vh !important;
+}
+
+@media  (max-width : 1000px) {
+
+    .carousel_img {
+         height: 25vh !important;
+     }
+}
+
+
+@media  (max-width : 700px) {
+
+    .carousel_img {
+         height: 25vh !important;
+     }
+
+
+}
+
+@media (max-width : 450px) {
+    body {
+        padding: 2px !important;
+    }    
+    .carousel_img {
+        height: 20vh !important;
+    }
+}
+
+
+.footer{ 
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding-left: 10%;
+    padding-right: 15%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    overflow: hidden;
+    border-radius: 8px !important;
+    border: 1px solid rgba(0,0,0,.1);
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.1);
+}
+
+.footer:hover {
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.header_shadow {
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.1) !important;
+}
+
+.header_shadow:hover {
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.list-style-none {
+    list-style: none  !important;
+}
+
+.child-0 {
+    max-width: 30%;
+}
+
+
+@media (max-width : 1000px) {
+    .footer {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+    
+    .child-1 {
+        order: 1;
+    } 
+
+    .child-0 {
+        max-width: 80%;
+    }
+}
+
+@media (max-width : 300px) {
+    .footer {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-left: 5%;
+        padding-right: 5%;
+        padding-bottom: 5%;
+        padding-top: 5%;
+    }
+
+    .child-1 {
+        order: 1;
+    } 
+
+    .child-0 {
+        max-width: 100%;
+    }
+}
+
+.cursor-pointer {
+    cursor:  pointer !important;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    cursor: pointer !important;
 }
 
-* {
-  box-sizing: border-box;
+a:hover {
+    opacity: 85%;
+}
+
+.rounded-img {
+    border-radius: 5px;
 }

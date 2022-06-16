@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+  // id        Int      @id @default(autoincrement())
+  // createdAt DateTime @default(now())
+  // email     String   @unique
+  // name      String?
+  // role      Role     @default(USER)
+  // posts     Post[]
+
+
+// Auth Types
+enum Auth {
+  Google 
+  Facebook
+  Twitter
+}
+
+// User Table
+model User {
+  id Int @id @default(autoincrement()) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  
+  name String @default("NULL")
+  email String @unique
+
+  isActive Boolean @default(false)
+  isAdmin  Boolean @default(false)
+  isStuff Boolean @default(false)
+  auth  Auth @default(Google)
+
+  // one to many
+  reviews Review[]
+}
+
+// Product Table
+model Product {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  name String 
+
+  price Decimal 
+  description String @default("no description added")
+ 
+  image String 
+  brand String 
+  rating Float 
+
+  countInStock Int @default(0)
+  reviewsCount Int @default(0)
+  veiws Int @default(0)
+  
+  // @ Relations
+  // many to one
+  category Category @relation(fields: [category_id] , references: [id]) 
+  category_id Int
+
+  // one to many
+  reviews Review[]
+}
+
+// Category Table
+model Category {
+  id Int @id @default(autoincrement())
+  name String @unique 
+  image String
+  product_id Int
+  
+  // @ Relations
+  // one to many
+  products Product[] 
+}
+
+// Review Table
+model Review {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  rating Float
+  comment String
+  
+  //@ user name
+
+  // @ Relations
+  // many to one
+  product Product @relation(fields: [product_id] , references: [id])
+  product_id Int 
+
+  user User @relation(fields : [user_id] , references:[id])
+  user_id Int
+}
+
+// Reply Table
+model Reply {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  
+}
