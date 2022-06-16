@@ -1,14 +1,31 @@
 import express from "express"
+import cors from 'cors'
+import bp from 'body-parser'
+import { parserErrorHandler } from './middlewares/customMiddleWare.js'
+const { json , urlencoded } = bp
 
 const app = express()
 
+import {  userRouter } from './routes/userRoutes.js'
+import { productRouter } from './routes/productRoutes.js'
+import { categoryRouter } from './routes/categoryRouters.js'
+
+app
+.use(cors())
+.use(json())
+.use(urlencoded({extended : true}))
+.use(parserErrorHandler) // error hanlder
+.use('/user/' , userRouter)
+.use ('/product/' , productRouter)
+.use ('/category' , categoryRouter)
+
+const PORT = 8000
 // Listen to server
-
-console.log('Welcome to ecommerce apis')
-
-app.listen(8000 , () => {
-    console.log(`server is running on port 8000`)
+app.listen(PORT , () => {
+  console.log('Welcome to ecommerce apis')
+  console.log(`server is running on port http://localhost:${PORT}/`)
 })
+
 
 
 // Routing

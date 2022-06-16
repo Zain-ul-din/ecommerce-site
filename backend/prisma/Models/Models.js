@@ -45,3 +45,33 @@ export const userData = [
     
 ]
 
+export const categoryData = [
+    {
+        name : "electronics" ,
+        image : "URL" ,
+        products : [] 
+    } ,
+    {
+        name : "beauty products" ,
+        image : "URL" ,
+        products : [] 
+    } ,
+    {
+        name : "vehicals" ,
+        image : "URL" ,
+        products : [] 
+    } ,
+]
+
+/*
+model Category {
+  id Int @id @default(autoincrement())
+  name String @unique 
+  image String
+  product_id Int
+  
+  // @ Relations
+  // one to many
+  products Product[] 
+}
+*/

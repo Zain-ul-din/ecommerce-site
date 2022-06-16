@@ -11,7 +11,7 @@ datasource db {
 }
 
   // id        Int      @id @default(autoincrement())
-  // createdAt DateTime @default(now())
+  // createdAt String 
   // email     String   @unique
   // name      String?
   // role      Role     @default(USER)
@@ -28,17 +28,17 @@ enum Auth {
 // User Table
 model User {
   id Int @id @default(autoincrement()) 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  createdAt String 
+  updatedAt String 
   
   name String @default("NULL")
   email String @unique
-
-  isActive Boolean @default(false)
+  
+  isActive Boolean @default(true)
   isAdmin  Boolean @default(false)
   isStuff Boolean @default(false)
   auth  Auth @default(Google)
-
+  
   // one to many
   reviews Review[]
 }
@@ -46,8 +46,8 @@ model User {
 // Product Table
 model Product {
   id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  createdAt String 
+  updatedAt String 
 
   name String 
 
@@ -76,7 +76,6 @@ model Category {
   id Int @id @default(autoincrement())
   name String @unique 
   image String
-  product_id Int
   
   // @ Relations
   // one to many
@@ -86,9 +85,9 @@ model Category {
 // Review Table
 model Review {
   id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-
+  createdAt String 
+  updatedAt String 
+  
   rating Float
   comment String
   
@@ -106,8 +105,6 @@ model Review {
 // Reply Table
 model Reply {
   id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-
-  
+  createdAt String 
+  updatedAt String 
 }

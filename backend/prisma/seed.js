@@ -1,4 +1,4 @@
-import { userData } from './Models/Models.js'
+import { userData , categoryData } from './Models/Models.js'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -24,12 +24,45 @@ async function uploadUsersData () {
                     product_id : review.product_id
                 }))
             }
-
+            
            }
          })
        })
     )   
 }
+
+async function UploadCategoryData () {
+    await Promise.all (
+        categoryData.map(async (category) => {
+            return prisma.category.upsert ({
+                where : {name : category.name} ,
+                update : {} ,
+                create : {
+                    name : category.name ,
+                    image : category.image ,
+                    products : { 
+                        create : category.products.map(product => {
+                            
+                        })
+                    }
+                }
+            })
+        })
+    )
+}
+
+
+await UploadCategoryData()
+.catch (err => {
+    console.log(err)
+    process.exit(1)
+})
+.then(val => console.log(val))
+.finally (()=> prisma.$disconnect())
+
+console.log('executed!!')
+
+/*
 
 uploadUsersData()
 .catch(err => {
@@ -41,3 +74,4 @@ uploadUsersData()
 })
 
 console.log('executed !!')
+*/
