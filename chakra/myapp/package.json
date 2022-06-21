@@ -13,6 +13,8 @@
     "@chakra-ui/react": "^2.2.1",
     "@emotion/react": "11",
     "@emotion/styled": "11",
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
     "firebase": "^9.8.3",
     "framer-motion": "6",
     "next": "12.1.6",
@@ -24,5 +26,9 @@
   "devDependencies": {
     "eslint": "8.17.0",
     "eslint-config-next": "12.1.6"
+  },
+  "browser": {
+    "fs": false,
+    "child_process": false
   }
 }

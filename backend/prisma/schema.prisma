@@ -10,29 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-  // id        Int      @id @default(autoincrement())
-  // createdAt String 
-  // email     String   @unique
-  // name      String?
-  // role      Role     @default(USER)
-  // posts     Post[]
-
-
-// Auth Types
 enum Auth {
   Google 
   Facebook
-  Twitter
+  Phonenumber
 }
 
-// User Table
 model User {
   id Int @id @default(autoincrement()) 
   createdAt String 
   updatedAt String 
   
-  name String @default("NULL")
-  email String @unique
+  name String @db.VarChar(256) @default("NULL")
+  email String @db.VarChar(256) @unique
   
   isActive Boolean @default(true)
   isAdmin  Boolean @default(false)
@@ -41,6 +31,18 @@ model User {
   
   // one to many
   reviews Review[]
+  replies  Reply []
+}
+
+// Category Table
+model Category {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(256) @unique 
+  image String @db.LongText
+  
+  // @ Relations
+  // one to many
+  products Product[] 
 }
 
 // Product Table
@@ -49,37 +51,28 @@ model Product {
   createdAt String 
   updatedAt String 
 
-  name String 
+  name String @db.VarChar(256)
 
   price Decimal 
-  description String @default("no description added")
- 
-  image String 
-  brand String 
+  description String @db.Text @default("no description added")
+  
+  image String @db.LongText
+  brand String @db.VarChar(256)
   rating Float 
-
+  
   countInStock Int @default(0)
   reviewsCount Int @default(0)
   veiws Int @default(0)
   
+  categoryName String? @db.VarChar(256)
+   
   // @ Relations
   // many to one
-  category Category @relation(fields: [category_id] , references: [id]) 
+  category Category @relation(fields: [category_id] , references: [id] , onDelete: Cascade , onUpdate: Cascade) 
   category_id Int
 
   // one to many
-  reviews Review[]
-}
-
-// Category Table
-model Category {
-  id Int @id @default(autoincrement())
-  name String @unique 
-  image String
-  
-  // @ Relations
-  // one to many
-  products Product[] 
+  reviews Review[] 
 }
 
 // Review Table
@@ -89,17 +82,22 @@ model Review {
   updatedAt String 
   
   rating Float
-  comment String
+  comment String @db.Text
   
-  //@ user name
-
+  userName String?
+  
   // @ Relations
   // many to one
-  product Product @relation(fields: [product_id] , references: [id])
-  product_id Int 
-
-  user User @relation(fields : [user_id] , references:[id])
   user_id Int
+  product_id Int
+  
+  product Product @relation(fields: [product_id] , references: [id], onDelete: Cascade , onUpdate: Cascade)
+  user User @relation(fields : [user_id] , references:[id] , onDelete: Cascade , onUpdate: Cascade)
+  
+  // one to many
+  replies Reply[]
+  
+  @@unique([id ,user_id , product_id])
 }
 
 // Reply Table
@@ -107,4 +105,18 @@ model Reply {
   id Int @id @default(autoincrement())
   createdAt String 
   updatedAt String 
+  
+  comment String @db.Text
+  userName String? @db.VarChar(256)
+  
+  // many to one
+  user User @relation (fields: [user_id] , references: [id] , onDelete: Cascade , onUpdate: Cascade)
+  review Review @relation(fields : [review_id] , references: [id], onDelete: Cascade , onUpdate: Cascade)
+  
+  user_id Int
+  review_id Int
+
+  @@unique([id , user_id , review_id])
 }
+
+

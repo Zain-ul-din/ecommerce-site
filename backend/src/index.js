@@ -8,25 +8,31 @@ const app = express()
 
 import {  userRouter } from './routes/userRoutes.js'
 import { productRouter } from './routes/productRoutes.js'
-import { categoryRouter } from './routes/categoryRouters.js'
+import { categoryRouter } from './routes/categoryRoutes.js'
+import { reviewRouter } from './routes/reviewRoutes.js'
+import { fileUploaderRouter } from './routes/fileUploaderRoutes.js'
 
 app
-.use(cors())
+.use(cors([
+  'http://localhost:3000/'
+]))
 .use(json())
 .use(urlencoded({extended : true}))
+//.use(express.static(__dirname))
 .use(parserErrorHandler) // error hanlder
 .use('/user/' , userRouter)
 .use ('/product/' , productRouter)
-.use ('/category' , categoryRouter)
+.use ('/category/' , categoryRouter)
+.use ('/review/' , reviewRouter)
+.use('/static/' , fileUploaderRouter)
 
 const PORT = 8000
+
 // Listen to server
 app.listen(PORT , () => {
   console.log('Welcome to ecommerce apis')
   console.log(`server is running on port http://localhost:${PORT}/`)
 })
-
-
 
 // Routing
 

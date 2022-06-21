@@ -1,24 +1,4 @@
 
-
-/*
-// User Table
-model User {
-  id Int @id @default(autoincrement()) 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  
-  name String @default("NULL")
-  email String @unique
-  isActive Boolean @default(false)
-  isAdmin  Boolean @default(false)
-  isStuff Boolean @default(false)
-  auth  Auth @default(Google)
-
-  // one to many
-  reviews Review[]
-}
-*/
-
 export const userData = [
     
     {
@@ -39,7 +19,7 @@ export const userData = [
     {
         name : "raveel nadeem" ,
         email : "raveel.lguCR@gmail.com",
-        auth : "Twitter" ,
+        auth : "Phonenumber" ,
         reviews : []
     }
     
@@ -63,15 +43,77 @@ export const categoryData = [
     } ,
 ]
 
-/*
-model Category {
-  id Int @id @default(autoincrement())
-  name String @unique 
-  image String
-  product_id Int
-  
-  // @ Relations
-  // one to many
-  products Product[] 
-}
-*/
+export const productData = [
+   {
+    "id" : 1,
+    "name" : "iphone14" ,
+    "price" : "5000" ,
+    "description" : "apple new product" ,
+    "image" : "URL" ,
+    "brand" : "APPLE" ,
+    "rating" : "4.8",
+    "countInStock" : "1",
+    "category_id" : "2" ,
+   }
+   ,
+   {
+    "id" : 2,
+    "name" : "iphone13" ,
+    "price" : "4000" ,
+    "description" : "apple new product" ,
+    "image" : "URL" ,
+    "brand" : "APPLE" ,
+    "rating" : "4.8",
+    "countInStock" : "1",
+    "category_id" : "1" ,
+   },
+   {
+    "id" : 3,
+    "name" : "iphone 13 MAX" ,
+    "price" : "5000" ,
+    "description" : "apple new product" ,
+    "image" : "URL" ,
+    "brand" : "APPLE" ,
+    "rating" : "4.8",
+    "countInStock" : "1",
+    "category_id" : "1" ,
+   }
+]
+
+export const reviewData = [
+    {
+        "id" : 1,
+        "rating" : "4.8" ,
+        "comment" : "nice product" ,
+        "product_id" : 3,
+        "user_id" : 1
+    } ,
+    {
+        "id" : 2,
+        "rating" : "4.8" ,
+        "comment" : "nice product" ,
+        "product_id" : 3,
+        "user_id" : 2
+    } ,
+    {
+        "id" : 3,
+        "rating" : "4.8" ,
+        "comment" : "nice product" ,
+        "product_id" : 3,
+        "user_id" : 3
+    } ,
+    {
+        "id" : 4 ,
+        "rating" : "5" ,
+        "comment" : "nice product" ,
+        "product_id" : 2 ,
+        "user_id" : 1,
+    },
+    {
+        "id" : 4 ,
+        "rating" : "5" ,
+        "comment" : "nice product" ,
+        "product_id" : 1 ,
+        "user_id" : 3,
+    }
+]

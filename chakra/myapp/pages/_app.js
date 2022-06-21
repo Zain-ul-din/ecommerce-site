@@ -14,13 +14,21 @@ const colors = {
 
 const theme = extendTheme({ colors })
 
+import {useEffect} from 'react'
+
 // 3. Pass the `theme` prop to the `ChakraProvider`
 function MyApp({ Component, pageProps }) {
+  
+  useEffect(()=>{
+    console.log(process.env.NEXT_PUBLIC_API_URL)
+  } ,[])
+  
   return (
     <ChakraProvider theme={theme}>
       <Component {...pageProps} />
     </ChakraProvider>
   )
 }
+
 
 export default MyApp;

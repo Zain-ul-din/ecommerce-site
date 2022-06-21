@@ -36,8 +36,14 @@ const CSS = `
   
 
 
-export function Category() {
-    
+export function Category(
+    {
+        id ,
+        name ,
+        image,
+        showBtn = true
+    }
+) {
 
     return (
       <Center py={12} mx= {1}>
@@ -64,7 +70,7 @@ export function Category() {
               pos: 'absolute',
               top: 5,
               left: 0,
-              backgroundImage: `url(${IMAGE})`,
+              backgroundImage: `url(${image})`,
               filter: 'blur(15px)',
               zIndex: -1,
             }}
@@ -78,19 +84,21 @@ export function Category() {
               height={200}
               width={282}
               alt = {`loading...`}
-              objectFit={'cover'}
-              src={IMAGE}
+              layout = {'responsive'}
+              src={image}
             />
           </Box>
           <Stack pt={12} align={'center'}>
             <Heading pt = {2}  fontSize={'.3xl'} fontFamily={'body'} justifySelf= {'center'} fontWeight={500} noOfLines={2}>
-              Laptops and accories
+                {name}
             </Heading>
+              {showBtn ?
             <Link href={'/home'}>
                <Text color={'blue.500'} fontSize={'sm'} textTransform={'uppercase'} role = {'button'} className = {'linkShopNow'}>
                  shop now
                </Text>
             </Link>
+                  : <> </>}
           </Stack>
         </Box>
         <style jsx>

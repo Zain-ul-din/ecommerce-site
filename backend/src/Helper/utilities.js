@@ -8,9 +8,9 @@ export const RESPONSE = {
 }
 
 export const BAD_REQ_RESPONSE = {
-    status : 402 ,
-    error : 'bad request' ,
-    data : null
+    status : 400 ,
+    message : 'fail' ,
+    error : 'bad request'
 }
 
 export function isValidDate(d) {
@@ -19,6 +19,12 @@ export function isValidDate(d) {
 
 export function PRISMA_ERROR_RESPONSE (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) 
-        return `fail with error code ${err.code} learn more about it site : https://www.prisma.io/docs/reference/api-reference/error-reference`
-    return `fail with unkown error`    
+        return {
+            message : `fail with error code ${err.code} learn more about it site : https://www.prisma.io/docs/reference/api-reference/error-reference` ,
+            code : err.code
+        }
+    return {
+        message : `fail with unkown error` ,
+        code : -1
+    }    
 }

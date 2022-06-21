@@ -17,7 +17,8 @@ Button,
 Stack,
 IconButton,
 FormControl,
-Container
+Container,
+Tooltip
 } from '@chakra-ui/react'
 
 import Image from 'next/image'
@@ -41,11 +42,13 @@ export function RatingComponent ({rating = 1}) {
     if (isFloat) arr [Math.floor(rating)] = "halfStar";
 
     return (
-        <>
+        <>           
+            <>
             {arr.map ((val , idx) => 
              <Text key={idx} className = '_stars' color={val === "star" || val == "halfStar" ? "yellow.500" : "gray.300"} >
                { val == "halfStar" ? <BsStarHalf/> : <BsStarFill/> }  
              </Text> )}
+             </>
         </>
     )
 }
@@ -87,10 +90,8 @@ export function Product () {
         rating: 4.5,
       };
 
-      
       const [mobBreakPoint]  = useBreakpoint() 
       const isMob = mobBreakPoint == 'b' || mobBreakPoint == 's'
-      
       
       return (
         <>
@@ -164,16 +165,15 @@ export default function Products () {
   const [cardsCountInRow , setCardCountInRow] = useState(5)
 
   useEffect (()=>{
-    
     const width = window.screen.width
     if ( width > 1300 ) setCardCountInRow(5)
     if ( width < 1300  ) setCardCountInRow(4)
     if ( width < 1000  ) setCardCountInRow(3)
     if ( width < 680 ) setCardCountInRow(2)
     if ( width < 300 ) setCardCountInRow(1)
-  })
+  } , [])
 
-
+  
   return (
         <>
           <Center>
