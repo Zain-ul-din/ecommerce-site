@@ -2,8 +2,12 @@
 import { Router } from "express"
 import { PrismaClient }  from '@prisma/client'
 import { RESPONSE , BAD_REQ_RESPONSE , PRISMA_ERROR_RESPONSE } from "../Helper/utilities.js" 
-import { isValidDate } from "../Helper/utilities.js"
+import { isValidDate , addSalt } from "../Helper/utilities.js"
 import { HTTP_RESPONSE } from "../Helper/HttpResponse.js"
+
+// hackers === 💀 || users === 😍
+import jwt from "jsonwebtoken"
+import cookie from 'cookie'
 
 export const userRouter = Router()
 const prisma = new PrismaClient()
@@ -15,6 +19,28 @@ async function getAll (req , res) {
 
 async function getUnique (req , res) {
     const user = await prisma.user.findMany({where : {email : req.params.email}})
+    
+    if (user.length !== 0) {
+     // creates token
+    
+     console.log(user[0])
+     const token = jwt.sign ( user[0] , process.env.JWT_SECRET , {
+        expiresIn : '24h'
+     })
+
+     console.log(process.env.COOKIE_NAME)
+     
+      res.setHeader ('Set-Cookie',  cookie.serialize (process.env.COOKIE_NAME,
+          addSalt(token , 'http') , {
+          httpOnly: false,
+          sameSite : 'lax',
+          maxAge : 24 * 60 * 60,
+          path : '/',
+          secure : process.env.NODE_ENV === 'production'
+         }
+      ))
+    }
+
     res.send (Object.assign (RESPONSE 
     , {status : user.length == 0 ? 404 : 200 , data : user.length == 0 ? null : user}))
 }
@@ -29,7 +55,7 @@ async function post (req , res) {
             name : user.name  ,
             email : user.email , 
             auth : user.auth ,
-        
+            
             isAdmin : user.isAdmin === undefined ? false : user.isAdmin ,
             isStuff : user.isStuff === undefined ? false : user.isStuff ,
             isActive : user.isActive === undefined ? true : user.isActive,
@@ -40,9 +66,29 @@ async function post (req , res) {
     }})
     .catch (e => { error = e })
     
-    if (error) res.send(Object.assign(BAD_REQ_RESPONSE 
-    , {error :  PRISMA_ERROR_RESPONSE(error)}))
-    else res.send(Object.assign(RESPONSE , { data : newUser , status : HTTP_RESPONSE.created}))
+    if (error){ 
+        res.send(Object.assign(BAD_REQ_RESPONSE 
+       , {error :  PRISMA_ERROR_RESPONSE(error)}))
+       return
+    }
+    
+    // creates token
+    
+    const token = jwt.sign (newUser , process.env.JWT_SECRET , {
+        expiresIn : '24h'
+    })
+
+    res.setHeader ('Set-Cookie',  cookie.serialize (process.env.COOKIE_NAME,
+        addSalt(token , 'http') , {
+        httpOnly: true,
+        sameSite : 'lax',
+        maxAge : 24 * 60 * 60,
+        path : '/',
+        secure : process.env.NODE_ENV === 'production'
+       }
+    ))
+    
+    res.send(Object.assign(RESPONSE , { data : newUser , status : HTTP_RESPONSE.created}))
 }
 
 async function deleteUnique (req , res) {

@@ -50,6 +50,7 @@ async function post (req , res) {
         countInStock : parseInt(product.countInStock ),
         category_id : parseInt(product.category_id ),
         categoryName : categoryName.name,
+        tags : product.tags === undefined ? "" : product.tags ,
         reviews : { create : [] }
        }
     })

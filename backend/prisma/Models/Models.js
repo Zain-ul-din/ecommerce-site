@@ -19,7 +19,7 @@ export const userData = [
     {
         name : "raveel nadeem" ,
         email : "raveel.lguCR@gmail.com",
-        auth : "Phonenumber" ,
+        auth : "Google" ,
         reviews : []
     }
     
@@ -49,11 +49,12 @@ export const productData = [
     "name" : "iphone14" ,
     "price" : "5000" ,
     "description" : "apple new product" ,
-    "image" : "URL" ,
+    "image" : "URL" , 
     "brand" : "APPLE" ,
     "rating" : "4.8",
     "countInStock" : "1",
     "category_id" : "2" ,
+    "tags" : "#hello #somedata #top"
    }
    ,
    {
@@ -66,6 +67,7 @@ export const productData = [
     "rating" : "4.8",
     "countInStock" : "1",
     "category_id" : "1" ,
+    "tags" : "#hello #somedata #top"
    },
    {
     "id" : 3,
@@ -77,6 +79,7 @@ export const productData = [
     "rating" : "4.8",
     "countInStock" : "1",
     "category_id" : "1" ,
+    "tags" : "#hello #somedata #top"
    }
 ]
 
@@ -117,3 +120,4 @@ export const reviewData = [
         "user_id" : 3,
     }
 ]
+

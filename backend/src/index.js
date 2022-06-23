@@ -13,9 +13,9 @@ import { reviewRouter } from './routes/reviewRoutes.js'
 import { fileUploaderRouter } from './routes/fileUploaderRoutes.js'
 
 app
-.use(cors([
-  'http://localhost:3000/'
-]))
+.use(cors(
+  {credentials: true, origin: 'http://localhost:3000'}
+))
 .use(json())
 .use(urlencoded({extended : true}))
 //.use(express.static(__dirname))

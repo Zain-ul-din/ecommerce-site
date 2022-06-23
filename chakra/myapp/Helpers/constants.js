@@ -1,0 +1,1 @@
+export const cookieName = 'c63c2db1c530292af42EIKOOC013685db7f97fe'

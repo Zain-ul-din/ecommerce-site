@@ -1,7 +1,10 @@
 // pages/_app.js
 import { ChakraProvider , extendTheme } from '@chakra-ui/react'
-
 import '../styles/globals.css'
+
+import Header from '../components/Header'
+
+import { useHttpie } from '../Hooks/RandomsHooks'
 
 // 2. Extend the theme to include custom colors, fonts, etc
 const colors = {
@@ -19,12 +22,9 @@ import {useEffect} from 'react'
 // 3. Pass the `theme` prop to the `ChakraProvider`
 function MyApp({ Component, pageProps }) {
   
-  useEffect(()=>{
-    console.log(process.env.NEXT_PUBLIC_API_URL)
-  } ,[])
-  
   return (
     <ChakraProvider theme={theme}>
+      <Header/>
       <Component {...pageProps} />
     </ChakraProvider>
   )

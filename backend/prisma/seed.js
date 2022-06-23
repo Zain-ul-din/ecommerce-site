@@ -85,11 +85,11 @@ async function deleteUser () {
     await prisma.user.delete ({where : {id : 3}})
 }
 
-await deleteUser()
-.catch (err => {
-    console.log(err)
-    process.exit(1)
-}).finally(()=> prisma.$disconnect())
+// await deleteUser()
+// .catch (err => {
+//     console.log(err)
+//     process.exit(1)
+// }).finally(()=> prisma.$disconnect())
 
 await UploadCategoryData()
 .catch (err => {

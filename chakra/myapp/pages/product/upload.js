@@ -1,5 +1,5 @@
 import React, {useState , useReducer, useEffect} from "react"
-import  { Button, useToast } from "@chakra-ui/react"
+import  { Badge, Button, color, Stack, useToast } from "@chakra-ui/react"
 import { Toaster } from "../../Helpers/Toaster"
 import {
     Flex,
@@ -16,7 +16,9 @@ import {
 import { Validator } from "../../Helpers/validator"
 import { uploadFile } from "../../Helpers/ApiFetcher";
 import axios from "axios";
+import {useRouter} from "next/router"
 
+import Link from "next/link"
 
 function InputField ({name , type , label ,  helperText = '' , state , dispatch  }) {
     
@@ -50,8 +52,6 @@ function InputField ({name , type , label ,  helperText = '' , state , dispatch 
 function TextInputField ({name , type , label ,  helperText = '' , state , dispatch  }) {
     
     const isError = state.errors[name] ? state.errors[name].error ? true : false : false;
-    
-
     
     return ( <Flex w = {'100%'} justifyContent={'center'} > 
         <Flex w = '2xl' py = {'1'}>
@@ -135,12 +135,12 @@ function reducer ( state , action ) {
             message : 'product name is too short'}}}
               
         case 'price':
-            return {...state , data : {...state.data , price : action.payload} 
+            return {...state , data : {...state.data , price : Math.abs(action.payload)} 
             , errors : {...state.errors ,
             price : { 
             error : action.payload.length > 0  ? undefined : '🎇' ,
             message : 'invalid price'}}}
-
+        
         case  'description':
             return {...state , data : {...state.data , description : action.payload}
             , errors : {...state.errors ,
@@ -160,40 +160,103 @@ function reducer ( state , action ) {
         case 'category':
             return {...state , data : {...state.data , categoryName : action.payload.name 
                 , category_id : action.payload.id},
-            errors : {...state.errors , category : {
-                error : undefined , message : '' }}}              
+            errors : {...state.errors , categoryName : {
+                error : undefined , message : '' }}}
+        case 'tags' :
+            return {...state , data : {...state.data , tags : action.payload} 
+            , errors : {...state.errors ,
+             tags : { error : undefined ,
+            message : ''}}}   
+        case 'reset':
+            return  { data : {} , errors : {} }                        
     } 
     
     return state
 }
 
 export async function getStaticProps(context) {
+    
+    const {data} = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/category`)
+
     return {
       props: {
-        category : [
-            {
-                id : 1 ,
-                name : 'product' 
-            }
-            ,
-            {
-                id : 2 ,
-                name : 'hello world'
-            }
-        ]
-      }, // will be passed to the page component as props
+        category : data.data
+      }
     }
 }
 
 
-export default function uploadProduct
+function TagsRenderer ({tags}) {
+    
+    const arr = tags.split ('#').filter (val => val.trim() !== '')
+
+    const colors = ['red' , 'purple' , 'green' ,'orange' , 'teal' , 'twitter']
+
+    return (
+        <>
+           {arr && arr.map ( (val , idx) => <Badge
+            key = {idx} 
+            colorScheme = {colors[Math.round(Math.random() * colors.length)]}
+            >{val}</Badge>)}
+        </>
+    )
+}
+
+
+export default function UploadProduct
     (props) {
+    
+
     const toast = useToast()
     
     const [rstate , dispatch] = useReducer(reducer , {data : {} , errors : {}}) 
-    console.log (rstate)
-
     
+    
+    async function handleUpload
+    () {
+       
+        const {errors} = rstate
+        
+        
+        if (Object.entries(errors).length < 6 ) {
+            Toaster (toast,"Input Fields are missing !!"  , 'error' )
+            return 
+        }
+        
+        const requied = ['name' , 'price' , 'description' , 'image' , 'countInStock' , 'categoryName' , 'tags' ]
+        
+        for (let [ key, val] of Object.entries (errors))
+            if (val.error !== undefined || !requied.includes(key)) {
+                Toaster (toast,"Input Fields are missing !!"  , 'error' )
+                return
+            }
+        
+        await uploadFile(rstate.data.image, async (imageUrl) => {
+            if (!imageUrl.data) {
+                Toaster(toast, "image upload fail", "error")
+                return
+            }
+            
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/product`, {
+                product : {...rstate.data , image : imageUrl.data }
+            }).catch(async (err) => {
+                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/static/${imageUrl.data}`)
+                Toaster(toast, "upload fail", "error")
+            })
+            
+            if (res.data && res.data.error && (res.data.error.code === "P2002" || res.data.error)) {
+                Toaster(toast, "upload fail category name already exists", "error")
+                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/static/${imageUrl.data}`)
+                return
+            }
+
+            if (res)  {
+                Toaster(toast, "data has been uploaded", "success")
+                dispatch ({type : 'reset'})
+            }
+        })
+    }
+
     return (
         <>  <Flex w = {'100%'} 
                 justifyContent= {'center'} 
@@ -206,6 +269,7 @@ export default function uploadProduct
              <Center>
                 <Text fontSize={'3xl'}>PRODUCT FORM</Text>
              </Center>
+
             <InputField
              name = 'name'  
              label = 'Enter Name'
@@ -246,15 +310,39 @@ export default function uploadProduct
              dispatch = {dispatch}
             />
 
+            {
+            props.category.length > 0 ?
             <DropDownInputField 
               name = 'category'
               label = 'Select Category'
               arr = {props.category}
               dispatch = {dispatch}
+            /> :<Center> <Link href = {'/category/upload'}>
+              <Text color={'red.400'} size = 'sm' as = {'button'} _hover = {{'color' : 'red.300'}}>No Category Added So Far ! Add new Category</Text>
+              </Link></Center>
+            }
+ 
+           <Center py = {2} fontWeight = {'bold'}>
+           <Text>TAGS :- </Text>
+            <Stack direction='row'>
+            { rstate.data.tags && <TagsRenderer
+               tags={rstate.data.tags}
+            /> }
+            </Stack>
+            </Center>
+
+            <TextInputField
+              name = 'tags'  
+              label = 'Enter Tags'
+              type = {'text'}
+              state= {rstate}
+              helperText = {'Example :-  #new  #top'}
+              dispatch = {dispatch}
             />
 
         <Center p = {5}>
-            <Button  size = {'lg'} color = 'green.600' variant={'outline'}>
+            <Button  size = {'lg'} color = 'green.600' variant={'outline'} 
+                onClick = {handleUpload}>
                  SUBMIT
             </Button>
         </Center>    
@@ -262,35 +350,3 @@ export default function uploadProduct
     )
 }
 
-
-/*
-    async function handleUpload
-    () {
-       if (!Validator(state , ['name' , 'price' , 'description' , 'image' , 'countInStock' , 'category_id'])) {
-           Toaster(toast , "Some input fields are missing " , "error")
-           return
-       }
-
-        await uploadFile(state.image, async (imageUrl) => {
-            if (!imageUrl.data) {
-                Toaster(toast, "image upload fail", "error")
-                return
-            }
-
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/product`, {
-                product : {...state , image : imageUrl.data }
-            }).catch(async (err) => {
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/static/${imageUrl.data}`)
-                Toaster(toast, "upload fail", "error")
-            })
-            
-            if (res.data && res.data.error && (res.data.error.code === "P2002" || res.data.error)) {
-                Toaster(toast, "upload fail category name already exists", "error")
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/static/${imageUrl.data}`)
-                return
-            }
-
-            if (res) Toaster(toast, "data has been uploaded", "success")
-        })
-    }
-    */
