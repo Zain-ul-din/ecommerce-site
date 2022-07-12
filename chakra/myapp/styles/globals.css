@@ -1,1 +1,55 @@
 
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+@media (max-width : 450px) {
+    body {
+        /* max-width: 400px !important; */
+        width: 400px !important;
+        overflow-x: scroll;
+    }
+}
+
+body::-webkit-scrollbar {
+    width: 6px;
+}
+   
+body::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(105, 103, 103, 0.3);
+}
+   
+body::-webkit-scrollbar-thumb {
+    background-color: #FFFFFF;
+    outline: 1px solid rgba(112, 128, 144, 0.337);
+}
+
+.boardslist { }
+
+.boardslist::-webkit-scrollbar {
+    width: 2px;
+}
+
+.boardslist::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(105, 103, 103, 0);
+}
+
+.boardslist::-webkit-scrollbar-thumb {
+    background-color: #ffffff00;
+    outline: 1px solid rgba(112, 128, 144, 0);
+}
+
+.cartScroll {}
+
+.cartScroll::-webkit-scrollbar {
+    width: 1px;
+}
+
+.cartScroll::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(53, 49, 49, 0);
+}
+
+.cartScroll::-webkit-scrollbar-thumb {
+    background-color: rgba(112, 183, 255, 0.706);
+}

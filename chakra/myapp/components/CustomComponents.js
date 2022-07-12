@@ -4,5 +4,3 @@ export function LoadingComponent () {
     return ( <> <Progress size='xs' isIndeterminate /> </> )
 }
 
-
-

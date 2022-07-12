@@ -1,4 +1,5 @@
-import react , { useState } from 'react'
+import  { useState  , useContext } from 'react'
+import { userContext as userState } from '../Hooks/Context'
 
 import {
     Flex,
@@ -7,7 +8,6 @@ import {
     FormLabel,
     Input,
     HStack,
-    InputRightElement,
     Stack,
     Button,
     Heading,
@@ -29,20 +29,83 @@ import {
     , SignInWithPopup
     , providers
     , SignOut 
+    , SignOutUser
 } from '../Helpers/firebase'
 
 import { useHttpie as httpPower } from '../Hooks/RandomsHooks'
+
+
+
 
 export default function LoginForm ( {mode = 'signin' | 'signup'} ) {
     
     const toast = useToast()
     const [ state , setState ] = useState({})
+    const userContext = useContext(userState)
+
+    async function SignInWithGoogle() {
+        SignOutUser(false)
+
+        try {
+            var res = await SignInWithPopup(auth, providers.google)
+            
+        } catch (err) {
+            const email = err.customData.email;
+            
+            if (mode === 'signup') {
+                setState({...state , email : email , auth : 'Google' , showData : true })
+                return
+            }
+            
+            await handleSignIn(email)
+            return
+        }
+        
+        const { email } = res.user
+        const  { photoURL } = res.user
+
+        if (mode === 'signup') {
+            setState({...state , email : email , auth : 'Google' , showData : true , avatar : photoURL })
+            return
+        }
+        
+        await handleSignIn(email)
+    }
     
-    async function handleSignIn (email) {
+    async function SignInWithFacebook() {
+        SignOutUser(false)
+
+        try {
+            var res = await SignInWithPopup(auth, providers.facebook)
+        }
+        catch (err) {
+            const email = err.customData.email;
+
+            if (mode === 'signup') {
+                setState({...state , email : email , auth : 'Facebook' , showData : true})
+                return
+            }
+            
+            await handleSignIn(email)
+            return
+        }
+        
+        const { email } = res._tokenResponse
+        const  { photoURL } = res._tokenResponse
+         
+        if (mode === 'signup') {
+            setState({...state , email : email , auth : 'Facebook' , showData : true , avatar : photoURL })
+            return
+        }
+        
+        await handleSignIn(email )
+    }
+    
+    async function handleSignIn (email ) {
 
         const res = await httpPower (`${process.env.NEXT_PUBLIC_SERVER_URL}/user/${email}` , 'GET')
         const { data } = res.data
-
+        
         // checks user already in record
         if (!data) {
             Toaster(toast , 'account not exists use sign up' , 'error')
@@ -50,6 +113,7 @@ export default function LoginForm ( {mode = 'signin' | 'signup'} ) {
             return
         }
         
+        userContext.setUser (data[0])
         Toaster(toast , 'login success' , 'success')
         await Router.push ('/')
     }
@@ -66,7 +130,6 @@ export default function LoginForm ( {mode = 'signin' | 'signup'} ) {
         const res = await httpPower(`${process.env.NEXT_PUBLIC_SERVER_URL}/user/${state.email}` , 'GET')
         const { data } = res.data
         
-        
         if (data && data.length !== 0) {
             Toaster(toast , 'account already exists use sign in ' , 'error' )
             await Router.push('/login')
@@ -79,70 +142,19 @@ export default function LoginForm ( {mode = 'signin' | 'signup'} ) {
             user : state
         }).catch (err => error = err)
         
+         
         if (error) {
             Toaster(toast , 'sign up fail some thing went wrong' , 'error' )
             return
         }
+        
+        const newUser = await httpPower (`${process.env.NEXT_PUBLIC_SERVER_URL}/user/${state.email}` , 'GET')
+        userContext.setUser (newUser.data.data[0])
 
         Toaster(toast , 'sign-up succeed' , 'success' )
         await Router.push ('/')
     }
 
-    async function SignInWithGoogle() {
-        SignOut (auth)
-
-        try {
-            var res = await SignInWithPopup(auth, providers.google)
-        } catch (err) {
-            const email = err.customData.email;
-            
-            if (mode === 'signup') {
-                setState({...state , email : email , auth : 'Google' , showData : true})
-                return
-            }
-            
-            await handleSignIn(email)
-            return
-        }
-
-        const {email} = res.user
-
-        if (mode === 'signup') {
-            setState({...state , email : email , auth : 'Google' , showData : true})
-            return
-        }
-        
-        await handleSignIn(email)
-    }
-    
-    async function SignInWithFacebook() {
-        SignOut (auth)
-
-        try {
-            var res = await SignInWithPopup(auth, providers.facebook)
-        }
-        catch (err) {
-            const email = err.customData.email;
-
-            if (mode === 'signup') {
-                setState({...state , email : email , auth : 'Google' , showData : true})
-                return
-            }
-            
-            await handleSignIn(email)
-            return
-        }
-        
-        const { email } = res._tokenResponse
-        
-        if (mode === 'signup') {
-            setState({...state , email : email , auth : 'Google' , showData : true})
-            return
-        }
-        
-        await handleSignIn(email)
-    }
-    
     return (
         <>
         <Flex minH={ '100vh'} align={ 'center'} justify={ 'center'} bg={useColorModeValue( 'gray.50', 'gray.800')}>

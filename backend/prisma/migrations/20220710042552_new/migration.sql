@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `user` MODIFY `name` VARCHAR(256) NOT NULL DEFAULT 'NULL';

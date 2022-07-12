@@ -1,5 +1,5 @@
-
-import React, { useEffect, useState } from 'react'
+// almost set
+import React, { useEffect, useState , useContext } from 'react'
 
 import { 
 Heading,
@@ -13,23 +13,32 @@ Input ,
 Grid ,
 GridItem,
 useBreakpoint,
-Button,
 Stack,
 IconButton,
 FormControl,
 Container,
-Tooltip
+useBreakpointValue,
+Popover ,
+PopoverTrigger ,
+PopoverContent ,
+PopoverBody ,
+PopoverHeader,
+Button,
+Switch ,
+FormLabel
+//Image
 } from '@chakra-ui/react'
 
 import Image from 'next/image'
-
-
-const IMAGE = `https://images.unsplash.com/photo-1518051870910-a46e30d9db16?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1350&q=80`
-
-import {BsStarFill , BsStarHalf} from 'react-icons/bs'
+import {BsStarFill , BsStarHalf , BsCartPlus} from 'react-icons/bs'
 import { SearchIcon } from '@chakra-ui/icons'
+import { FcFilledFilter } from 'react-icons/fc' 
 
 var arr = []
+
+import { cartContext } from '../Hooks/RandomsHooks'
+
+import Link from 'next/link'
 
 // rating Component
 export function RatingComponent ({rating = 1}) {
@@ -40,7 +49,7 @@ export function RatingComponent ({rating = 1}) {
             if (parseInt(rating) >= i) arr.push ("star")
             else arr.push("NULL")
     if (isFloat) arr [Math.floor(rating)] = "halfStar";
-
+    
     return (
         <>           
             <>
@@ -77,25 +86,20 @@ const CSS = `
 `  
 
 // A Single Product Card
-export function Product () {
+export function Product ({
+  id , imageUrl = "/productImage.avif" , imageAlt = 'loading' , title , price , rating
+  , reviewCount , badgeText , product
+}) {
+    
+    const [mobBreakPoint]  = useBreakpoint() 
+    const isMob = mobBreakPoint == 'b' || mobBreakPoint == 's'
+    const addToCart = useContext (cartContext)
 
-    const property = {
-        imageUrl: "/productImage.avif",
-        imageAlt: "Rear view of modern home with pool",
-        beds: 3,
-        baths: 2,
-        title: "Modern home in city center in the heart of historic Los Angeles",
-        formattedPrice: "$1,900.00",
-        reviewCount: 34,
-        rating: 4.5,
-      };
-
-      const [mobBreakPoint]  = useBreakpoint() 
-      const isMob = mobBreakPoint == 'b' || mobBreakPoint == 's'
-      
-      return (
+    return (
         <>
+        <Link href = {`/product/${id}`}>
         <Flex
+          cursor={'pointer'}
           p = {2}
           w= {isMob ? "50" : "70"}
           alignItems="center"
@@ -105,29 +109,34 @@ export function Product () {
         >
           <Box
             bg="white"
-            _dark={{
-              bg: "gray.800",
-            }}
             maxW="sm"
             borderWidth="1px"
             rounded="xl"
             shadow="lg"
           >
             <Image
-              src={property.imageUrl}
-              alt={property.imageAlt}
+              src = {`http://localhost:8000/static/${imageUrl}`} 
+              alt={imageAlt}
               width={382}
               height = {254}
             />
     
             <Box px={isMob ? "2" : "6"} py = {isMob ?"2" : "4"}>
               <Box display="flex" alignItems="baseline">
+                {badgeText && 
                 <Badge rounded="full" px="2" colorScheme="teal">
-                  New
-                </Badge>
-                <Text color={'blue.500'} fontSize={isMob ? 'x-small' : 'sm'} textTransform={'uppercase'} role = {'button'} className = {'linkShopNow'} px = {2}>
-                 Add to Cart
+                  {badgeText}
+                </Badge> }
+                
+                <Text color={'blue.500'} fontSize={isMob ? 'x-small' : 'sm'} textTransform={'uppercase'} role = {'button'} className = {'linkShopNow'} px = {2}
+                 onClick = {(e)=>{
+                  e.stopPropagation()
+                  addToCart.dispatch ({type : 'Add' , payload : product})
+                 }}
+                >
+                 Add to Cart 
                </Text>
+               
               </Box>
     
               <Text
@@ -138,49 +147,74 @@ export function Product () {
                 fontSize={isMob ? "sm" : ""}
                 noOfLines={isMob ? 3 : 2}
               >
-                {property.title}
+                {title}
               </Text>
     
               <Box fontSize={isMob ? "sm" : ""} fontWeight="semibold">
-                {property.formattedPrice}
+                <Stack direction={'row'}>
+                  <Text color={'blackAlpha.700'}>{ price } </Text>
+                  <Text color = {'facebook.700'}> PKR </Text>
+                </Stack>
               </Box>
     
               <Box display="flex" mt= { isMob ? "1" : "2"} alignItems="center">
-                <RatingComponent rating={3.7}/>
+                <RatingComponent rating={rating}/>
                 <Box as="span" ml="2" color="gray.600" fontSize={isMob ? "x-small" : "sm"} lineHeight="tight">
-                  {property.reviewCount} reviews
+                  {reviewCount} reviews
                 </Box>
               </Box>
             </Box>
           </Box>
           <style jsx>{CSS}</style>
         </Flex>
+        </Link>
         </>
-      );
+    )
 }
 
 // Products
-export default function Products () {
+export default function Products (
+ { label , products }
+) {
 
   const [cardsCountInRow , setCardCountInRow] = useState(5)
-
+  const mediaQuery = useBreakpointValue({})
+  
   useEffect (()=>{
     const width = window.screen.width
     if ( width > 1300 ) setCardCountInRow(5)
     if ( width < 1300  ) setCardCountInRow(4)
     if ( width < 1000  ) setCardCountInRow(3)
     if ( width < 680 ) setCardCountInRow(2)
-    if ( width < 300 ) setCardCountInRow(1)
-  } , [])
-
+    if ( width < 300 ) setCardCountInRow(2)
+  }  , [mediaQuery])
+   
+  const [filterState , setFilterState] = useState (false) // switch toggler state
+  const [state , setState] = useState ({rating : 0 , min : 0 , max : 99999999})
+  const [searchVal , setSearchVal] = useState ('')
   
+  
+  const min = products?.reduce ( (acc , curr) => acc.price < curr.price ? acc : curr ,0)
+  const max = products?.reduce ( (acc , curr) => acc.price > curr.price ? acc : curr ,0)
+  
+  useEffect (()=>{
+    setState ({...state , min : min.price})
+    setState ({...state , max : max.price})
+  } , [])
+  
+  let filterProducts = products.filter (product => product.name.toLowerCase().includes (searchVal))
+
+  if (filterState) {
+   filterProducts = filterProducts.filter (product => product.rating >= state.rating 
+    && product.price >= state.min && product.price <=  state.max)
+  }
+
   return (
         <>
           <Center>
-            <Heading fontSize={'3xl'} my = {8} >Top Products 🔥</Heading>
+            <Heading fontSize={'3xl'} my = {8} >{label}</Heading>
           </Center>
             
-          
           <Container
              px = {5}
              display = {'flex'}
@@ -191,23 +225,83 @@ export default function Products () {
              mb = {5}
             >
               <FormControl>
-              <Input type={'text'} placeholder = {'Search Products'} display = {'block'} />
+                <Input type={'text'} placeholder = {'Search Products'} display = {'block'} 
+                  value = {searchVal}
+                  onChange = {(e) => setSearchVal (e.target.value.toLowerCase())}
+                />
               </FormControl>
-              
-               <IconButton aria-label='Search database' colorScheme={'twitter'} icon={<SearchIcon />} mx = {2} />
-              
+              <Popover trigger={`hover`}>
+               <PopoverTrigger> 
+                <IconButton aria-label='Search database' 
+                 as = {`button`} 
+                 colorScheme={`gray`} 
+                 icon={<FcFilledFilter />} 
+                 mx = {2} 
+                />
+               </PopoverTrigger>
+               <PopoverContent>
+                 <PopoverHeader>Product Filter</PopoverHeader>
+                 <PopoverBody>
+                   <Stack>
+                   <Text>Enable Product Filter</Text>
+                    <Switch size = {`md`} isChecked = {filterState} onChange = {(e)=> setFilterState (!filterState)}/>
+                    {filterState && <>
+                        <Stack direction={'row'}><RatingComponent rating={state.rating}/></Stack>
+                        <Input type={`number`} 
+                          placeholder = {`Enter Rating`}
+                          defaultValue = {0}
+                          onChange = {(e)=>{
+                            e.preventDefault ()
+                            if (!isNaN (parseFloat (e.target.value))) 
+                              setState ({...state , rating : ((min , max , val)=>{
+                                   return val < min ? min : val > max ? max : val
+                              })(0 , 5 , parseFloat(e.target.value)) })
+                          }}
+                        />
+                        
+                        <Stack direction={'row'}>
+                        <FormControl>
+                          <FormLabel>Min Price : </FormLabel>
+                          <Input type={'number'} value = {state.min} onChange = {(e)=>{
+                               setState ({...state , min : parseFloat(e.target.value)})
+                          }}/>
+                        </FormControl>
+                        <FormControl>
+                          <FormLabel>Max Price : </FormLabel>
+                          <Input type={'number'} value = {state.max} onChange = {(e)=>{
+                               setState ({...state , max : parseFloat(e.target.value)})
+                          }}/>
+                        </FormControl>
+                        </Stack>
+                    </>}
+                   </Stack>
+                 </PopoverBody>
+               </PopoverContent>
+              </Popover>
           </Container>
           
-          <Center px = {2}>
+        <Center px = {2}>
            <Grid templateColumns={`repeat(${cardsCountInRow}, 2fr)`} gap={.5}>
-             <GridItem> <Product/> </GridItem>
-             <GridItem> <Product/> </GridItem>
-             <GridItem> <Product/> </GridItem>
-             <GridItem> <Product/> </GridItem>
-             <GridItem> <Product/> </GridItem>
+           {filterProducts && filterProducts.map ( (product , idx) => 
+          <GridItem key = {idx}> 
+          <Product 
+           id = {product.id}
+           imageUrl = {product.image}  
+           imageAlt = 'loading'  
+           title = {product.name}
+           price = {product.price}  rating = {product.rating} reviewCount = {product.reviewsCount} 
+           badgeText = {'new'}
+           product = {product}
+           />
+          </GridItem>)}  
            </Grid>
          </Center>
+         {filterProducts.length === 0 && 
+         <Center>
+             <Text fontSize = {'7xl'} color = {`red.400`}>  ! NOT FOUND</Text>
+         </Center> }
          <Container mb = {3}/>
         </>
     )
 }
+

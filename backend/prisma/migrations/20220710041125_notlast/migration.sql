@@ -9,6 +9,7 @@ CREATE TABLE `User` (
     `isAdmin` BOOLEAN NOT NULL DEFAULT false,
     `isStuff` BOOLEAN NOT NULL DEFAULT false,
     `auth` ENUM('Google', 'Facebook', 'Twitter') NOT NULL DEFAULT 'Google',
+    `avatar` MEDIUMTEXT NOT NULL,
 
     UNIQUE INDEX `User_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -19,8 +20,20 @@ CREATE TABLE `Category` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(256) NOT NULL,
     `image` LONGTEXT NOT NULL,
+    `superCategoryName` VARCHAR(256) NOT NULL,
+    `superCategory_id` INTEGER NOT NULL,
 
-    UNIQUE INDEX `Category_name_key`(`name`),
+    UNIQUE INDEX `Category_id_superCategory_id_name_key`(`id`, `superCategory_id`, `name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `SuperCategory` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(256) NOT NULL,
+    `image` LONGTEXT NOT NULL,
+
+    UNIQUE INDEX `SuperCategory_name_key`(`name`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -34,7 +47,7 @@ CREATE TABLE `Product` (
     `description` MEDIUMTEXT NOT NULL,
     `image` LONGTEXT NOT NULL,
     `brand` VARCHAR(256) NOT NULL,
-    `rating` DOUBLE NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    `rating` DOUBLE NOT NULL,
     `countInStock` INTEGER NOT NULL DEFAULT 0,
     `reviewsCount` INTEGER NOT NULL DEFAULT 0,
     `veiws` INTEGER NOT NULL DEFAULT 0,
@@ -75,6 +88,9 @@ CREATE TABLE `Reply` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
+ALTER TABLE `Category` ADD CONSTRAINT `Category_superCategory_id_fkey` FOREIGN KEY (`superCategory_id`) REFERENCES `SuperCategory`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Product` ADD CONSTRAINT `Product_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -88,6 +104,3 @@ ALTER TABLE `Reply` ADD CONSTRAINT `Reply_user_id_fkey` FOREIGN KEY (`user_id`) 
 
 -- AddForeignKey
 ALTER TABLE `Reply` ADD CONSTRAINT `Reply_review_id_fkey` FOREIGN KEY (`review_id`) REFERENCES `Review`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- Checks
-ALTER TABLE `Product` ADD CONSTRAINT `rating` CHECK (rating >= 0 && rating <= 5);

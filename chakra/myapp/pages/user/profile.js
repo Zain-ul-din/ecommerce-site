@@ -1,24 +1,8 @@
-
-import { useEffect, useState } from "react"
-import { getUserByToken } from "../../Helpers/Auth"
-import { LoadingComponent } from "../../components/CustomComponents"
-import { cookieName } from "../../Helpers/constants"
+import { useContext } from "react"
+import { userContext } from "../../Hooks/Context"
+import UserProfileComponent from "../../components/UserProfile"
 
 export default function UserProfile () {
-    
-  const [loading , setLoading] = useState (true)
-  const [user , setUser] = useState (null)
-  
-  useEffect (()=> {
-    const cookie = document.cookie.match (cookieName)
-    setUser (getUserByToken (cookie.input))
-    setLoading (false)
-  } , [])
-  
-  return (
-        <>{ loading ? ( <LoadingComponent/> )  : <> {user.name} </> }</>        
-  )
-  
+  const context = useContext (userContext)
+  return  <> { context.user && <UserProfileComponent {...context} />  } </>
 }
-
-// looking ok

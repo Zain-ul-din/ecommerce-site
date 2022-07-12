@@ -6,11 +6,22 @@ const { json , urlencoded } = bp
 
 const app = express()
 
+// socket.io
+
+import http from 'http'
+import { Server } from "socket.io"
+
+const server = http.createServer (app)
+const io = new Server (server , {
+  cors : {origin : "*"}
+})
+
 import {  userRouter } from './routes/userRoutes.js'
 import { productRouter } from './routes/productRoutes.js'
 import { categoryRouter } from './routes/categoryRoutes.js'
 import { reviewRouter } from './routes/reviewRoutes.js'
 import { fileUploaderRouter } from './routes/fileUploaderRoutes.js'
+import { superCategoryRouter } from './routes/superCategoryRoutes.js'
 
 app
 .use(cors(
@@ -22,14 +33,20 @@ app
 .use(parserErrorHandler) // error hanlder
 .use('/user/' , userRouter)
 .use ('/product/' , productRouter)
-.use ('/category/' , categoryRouter)
+.use ('/category/' , superCategoryRouter)
+.use ('/subcategory/' , categoryRouter)
 .use ('/review/' , reviewRouter)
 .use('/static/' , fileUploaderRouter)
 
-const PORT = 8000
+// socket.io connection
+io.on ('connection' , (socket) => { 
+  socket.on ('onProductChange' , message => { io.emit ('onProductChange' , message) })
+  socket.on ('onUserChange' , email => {io.emit ('onUserChange' , email)})
+})
 
+const PORT = 8000
 // Listen to server
-app.listen(PORT , () => {
+server.listen(PORT , () => {
   console.log('Welcome to ecommerce apis')
   console.log(`server is running on port http://localhost:${PORT}/`)
 })

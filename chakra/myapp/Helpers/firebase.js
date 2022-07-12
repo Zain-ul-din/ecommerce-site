@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAuth ,signInWithPopup , GoogleAuthProvider , signOut  , FacebookAuthProvider  }
 from "firebase/auth"
+import { cookieName } from "./constants";
+import Router from "next/router"
 
 export const firebaseConfig = {
     apiKey: "AIzaSyCe6_Ulk0UZoJp23UPti1TOJpSHwKUiWOc",
@@ -27,3 +29,11 @@ export const providers = {
     google : new GoogleAuthProvider() ,
     facebook : new FacebookAuthProvider() 
 }
+
+export const SignOutUser  = (canReload = true) => {
+    signOut (getAuth())
+    document.cookie = cookieName + '=; Max-Age=-99999999;'
+    if (canReload) Router.push ('/')
+}
+
+

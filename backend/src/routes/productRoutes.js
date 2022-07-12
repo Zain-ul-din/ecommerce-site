@@ -4,22 +4,21 @@ import { PrismaClient }  from '@prisma/client'
 import { RESPONSE , BAD_REQ_RESPONSE , PRISMA_ERROR_RESPONSE } from "../Helper/utilities.js" 
 import { isValidDate } from "../Helper/utilities.js"
 import { HTTP_RESPONSE } from "../Helper/HttpResponse.js"
+import fs from 'fs'
 
 export const productRouter = Router()
 const prisma = new PrismaClient()
 
 async function getAll (req , res) {
-   var products = await prisma.product.findMany({})
-   
-   products = await Promise.all (products.map( async (p) => {
-       return Object.assign(p , {reviews : await prisma.review.findMany({where : {product_id : p.id }})}) 
-   }))
+   var products = await prisma.product.findMany({
+    include : {reviews : true}
+   })
    
    res.send(Object.assign(RESPONSE , {data : products}))
 }
 
 async function getUnique (req , res) {
-   const id = parseInt (req.params.id)
+   let id = isNaN( req.params.id) ? -1 : parseInt( req.params.id)  
    var product = await prisma.product.findMany({where : {id : id } })
    if ( Array.isArray(product) )
         product = await Promise.all (product.map( async (p) => {
@@ -28,6 +27,19 @@ async function getUnique (req , res) {
       
     res.send (Object.assign(RESPONSE 
     , {status : product.length == 0 ? 404 : 200 , data : product.length == 0 ? null : product}))
+}
+
+async function getByArray (req , res) {
+    try {
+      let { ids } = req.query
+      if (!Array.isArray (ids)) throw new Error ('query is not an array')
+      var products = await prisma.product.findMany ({where : { id : { in : ids.map (id => parseInt (id))  } }})
+    } catch (err) { 
+      res.send ([])
+      return
+    }
+    
+    res.send (products)
 }
 
 async function post (req , res) {
@@ -66,8 +78,10 @@ async function deleteUnique (req , res) {
     const id = parseInt(req.params.id)
     let error = null
     
-    // delete review
-    await prisma.review.deleteMany({where : {product_id : id}}).catch(e=>e)
+    try {
+      const product = await prisma.product.findUnique ({where : {id : id}})
+      fs.unlinkSync(`${process.cwd()}/static/images/${product.image}`)
+    } catch (err) {}
     
     await prisma.product.delete ({where : { id : id }})
     .catch(err => error = err)
@@ -85,12 +99,19 @@ async function updateUnique (req , res) {
     let error = null
     let ratingCount = 0
     
-     
+    const prev_product = await prisma.product.findUnique ({where : {id : id}})
+    
+    if (product.image === null) product.image = prev_product.image
+    else { // delete prev image
+        try { fs.unlinkSync(`${process.cwd()}/static/images/${prev_product.image}`) }
+        catch (err) {}
+    }
+    
     const updatedProduct = await prisma.product.update({
         where : {id : id} ,
         data : {
             createdAt : isValidDate(new Date(product.createdAt)) ? product.createdAt : new Date().toString(),
-            updatedAt : isValidDate(new Date(product.updatedAt)) ? product.updatedAt : new Date().toString(),
+            updatedAt : new Date().toString() ,
             name : product.name ,
             price : parseFloat(product.price) ,
             description : product.description ,
@@ -108,7 +129,8 @@ async function updateUnique (req , res) {
             countInStock : parseInt(product.countInStock ),
             category_id : parseInt(product.category_id ),
             reviewsCount : parseInt(product.reviewsCount) ,
-            veiws : parseInt(product.veiws)
+            veiws : parseInt(product.veiws) ,
+            tags : product.tags
         }
     })
     .catch(err => error = err)
@@ -122,6 +144,7 @@ async function updateUnique (req , res) {
 // Product Router
 productRouter
 .get ('/' , getAll)
+.get ('/ids' , getByArray)
 .get ('/:id' , getUnique)
 .post ('/' , post)
 .delete ('/:id' , deleteUnique)

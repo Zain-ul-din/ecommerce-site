@@ -29,6 +29,8 @@ model User {
   isStuff Boolean @default(false)
   auth  Auth @default(Google)
   
+  avatar String @db.MediumText
+  
   // one to many
   reviews Review[]
   replies  Reply []
@@ -37,12 +39,28 @@ model User {
 // Category Table
 model Category {
   id Int @id @default(autoincrement())
-  name String @db.VarChar(256) @unique 
+  name String @db.VarChar(256) 
   image String @db.LongText
   
   // @ Relations
   // one to many
   products Product[] 
+
+  // many to one
+  superCategoryName String @db.VarChar(256) 
+  superCategory SuperCategory @relation(fields: [superCategory_id] , references: [id] , onDelete: Cascade , onUpdate: Cascade) 
+  superCategory_id Int 
+  
+  @@unique([name , superCategoryName]) 
+}
+
+model SuperCategory {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(256) @unique
+  image String @db.LongText
+   
+  // one to many
+  categories Category[]
 }
 
 // Product Table
@@ -75,6 +93,7 @@ model Product {
 
   // one to many
   reviews Review[] 
+
 }
 
 // Review Table
@@ -120,5 +139,55 @@ model Reply {
   
   @@unique([id , user_id , review_id])
 }
+
+
+enum PaymentMethod {
+  CashOnDelivery
+}
+
+enum OrderStatus {
+  Pending 
+  Approved
+  Canceled
+}
+
+model OrderItem {
+   id Int @id @default(autoincrement()) 
+   qt Int 
+   name String @db.VarChar (256) 
+   price Decimal 
+   product_id Int
+   order_id Int
+   totalBill Decimal
+   order Order @relation(fields: [order_id] , references: [id])
+}
+
+model ShippingAddress {
+  id Int @id @default(autoincrement())
+  userName String @db.VarChar(256)
+  address String @db.MediumText 
+  postalCode  Int
+  city String
+  country String
+  order Order[]
+}
+
+model Order {
+   id Int @id @default(autoincrement())
+   paymentMethod PaymentMethod 
+   totalBill Decimal 
+   tax Decimal @default(0)
+   shippingPrice Decimal @default (0)
+   isPaid Boolean @default (false)
+   status OrderStatus @default(Pending)
+   deliveredAt String 
+   createdAt String
+   shippingAddress ShippingAddress @relation(fields: [shippingAddress_id] , references: [id])
+   shippingAddress_id Int
+   orderItems OrderItem []
+}
+
+
+
 
 

@@ -14,14 +14,14 @@ async function getAll (req , res) {
 }
 
 async function getByPId (req , res) {
-   const id = parseInt (req.params.pid) 
+   let id = isNaN( req.params.id) ? -1 : parseInt( req.params.id)  
    const review = await prisma.review.findMany ({where : {product_id : id}})
    res.send (Object.assign(RESPONSE 
     , {status : review.length == 0 ? 404 : 200 , data : review.length == 0 ? null : review}))
 }
 
 async function getByUEmail (req , res) {
-    const id = parseInt(req.params.uid)
+    let id = isNaN( req.params.id) ? -1 : parseInt( req.params.id)  
     const review = await prisma.review.findMany ({where : {user_id : id}})
     res.send (Object.assign(RESPONSE 
     , {status : review.length == 0 ? 404 : 200 , data : review.length == 0 ? null : review}))
@@ -33,7 +33,7 @@ async function post (req , res) {
     let error = null
     
     const userName = await prisma.user.findUnique ({where : {id : parseInt(review.user_id)}}).catch(e=>e)
-
+    
     const newReview = await prisma.review.create ({
         data : {
             createdAt : isValidDate(new Date(review.createdAt)) ?review.createdAt : new Date().toString(),

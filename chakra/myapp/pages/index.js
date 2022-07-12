@@ -18,6 +18,7 @@ import Slider from 'react-slick';
 import Categories from '../components/Categories';
 import Footer from '../components/Footer'
 
+
 // Settings for the slider
 const settings = {
   dots: true,
@@ -31,10 +32,20 @@ const settings = {
   slidesToScroll: 1,
 };
 
+import { useHttpie as power } from '../Hooks/RandomsHooks';
+
+export async function getServerSideProps () {
+  const { data } = await power (`${process.env.NEXT_PUBLIC_SERVER_URL}/category` , 'GET')
+  const res = await power (`${process.env.NEXT_PUBLIC_SERVER_URL}/product` , 'GET')
+  
+  return {
+    props : { categories : data.data  , products : res.data.data }
+  }
+}
 
 
-
-export default function Home() {
+export default function Home(props) {
+  
   // As we have used custom buttons, we need a reference variable to
   // change the state
   const [slider, setSlider] = React.useState(Slider | null);
@@ -45,7 +56,6 @@ export default function Home() {
   const top = useBreakpointValue({ base: `90%`, md: `50%` });
   const side = useBreakpointValue({ base: `30%`, md: `10px` });
 
-
   // These are the images used in the slide
   const cards = [
     `https://images.unsplash.com/photo-1612852098516-55d01c75769a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDR8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=900&q=60`,
@@ -53,6 +63,7 @@ export default function Home() {
     `https://images.unsplash.com/photo-1571432248690-7fd6980a1ae2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDl8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=900&q=60`,
   ];
 
+  
   return (
     <>
     <Box
@@ -115,9 +126,9 @@ export default function Home() {
         ))}
       </Slider>
     </Box>
-
-    <Categories/> 
-    <Products/>
+    
+    <Categories categories = {props.categories} /> 
+    <Products products={props.products} label = {'Top Products ❤'}/>
     <Footer/>
     </>
   );

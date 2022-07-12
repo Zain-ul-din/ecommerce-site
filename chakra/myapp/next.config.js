@@ -2,11 +2,23 @@
 
 require('dotenv').config()
 
-// const withImages = require('next-images')
+
 
 const nextConfig = {
   reactStrictMode: false,
-  // withImages : withImages()
+  images: {
+    domains: ['localhost'],
+  },
+  components: {
+    Modal: {
+      baseStyle: {
+        dialogContainer: {
+          "@supports(height: -webkit-fill-available)": {},
+        },
+      },
+    },
+  },
 }
 
 module.exports = nextConfig
+

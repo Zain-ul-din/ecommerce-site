@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 import getUserAuth from '../Helpers/Auth'
 import { cookieName } from '../Helpers/constants'
 
-const userPages = ['/user/profile' , '/user/orders']
-const stuffPages = ['/product/upload' , 'category/upload']
-
+const userPages = ['/user/profile' , '/user/orders' , '/user/cart']
+const stuffPages = []
+// '/product/upload' , 'category/upload'
 export default function middleware (req) {
     
     // user pages redirects

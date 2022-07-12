@@ -21,14 +21,10 @@ async function getUnique (req , res) {
     const user = await prisma.user.findMany({where : {email : req.params.email}})
     
     if (user.length !== 0) {
-     // creates token
-    
-     console.log(user[0])
-     const token = jwt.sign ( user[0] , process.env.JWT_SECRET , {
-        expiresIn : '24h'
-     })
 
-     console.log(process.env.COOKIE_NAME)
+      const token = jwt.sign ( user[0] , process.env.JWT_SECRET , {
+        expiresIn : '24h'
+      })
      
       res.setHeader ('Set-Cookie',  cookie.serialize (process.env.COOKIE_NAME,
           addSalt(token , 'http') , {
@@ -45,6 +41,13 @@ async function getUnique (req , res) {
     , {status : user.length == 0 ? 404 : 200 , data : user.length == 0 ? null : user}))
 }
 
+async function getUniqueProfile (req , res) {
+    const user = await prisma.user.findMany({where : {id : parseInt(req.params.id)}})
+    
+    res.send (Object.assign (RESPONSE 
+        , {status : user.length == 0 ? 404 : 200 , data : user.length == 0 ? null : user}))
+}
+
 async function post (req , res) {
     var { user  } = req.body
     user = typeof user !== 'object' ? {} : user
@@ -55,7 +58,7 @@ async function post (req , res) {
             name : user.name  ,
             email : user.email , 
             auth : user.auth ,
-            
+            avatar : user.avatar , 
             isAdmin : user.isAdmin === undefined ? false : user.isAdmin ,
             isStuff : user.isStuff === undefined ? false : user.isStuff ,
             isActive : user.isActive === undefined ? true : user.isActive,
@@ -116,25 +119,31 @@ async function updateUnique (req , res) {
             name : user.name  ,
             email : user.email , 
             auth : user.auth ,
-        
+            avatar : user.avatar , 
             isAdmin : user.isAdmin === undefined ? false : user.isAdmin ,
             isStuff : user.isStuff === undefined ? false : user.isStuff ,
             isActive : user.isActive === undefined ? true : user.isActive,
             createdAt : isValidDate(new Date(user.createdAt)) ? user.createdAt : new Date().toString(),
-            updatedAt : isValidDate(new Date(user.updatedAt)) ? user.updatedAt : new Date().toString(),
+            updatedAt : new Date().toString() ,
         }
     })
     .catch (err => error = err)
     
-    if (error) res.send(Object.assign(BAD_REQ_RESPONSE 
+    if (error) {
+        res.send(Object.assign(BAD_REQ_RESPONSE 
         , {error :  PRISMA_ERROR_RESPONSE(error)}))
-    else res.send(Object.assign(RESPONSE , { data : updatedUser }))
+        return 
+    }
+    
+
+    res.send(Object.assign(RESPONSE , { data : updatedUser , status : HTTP_RESPONSE.ok}))
 }
 
 // user CRUD
 userRouter
 .get ('/' , getAll)
 .get ('/:email' , getUnique)
+.get ('/profile/:id' , getUniqueProfile)
 .post ('/' , post)
 .delete('/:id' , deleteUnique)
 .put ('/:email' , updateUnique )
