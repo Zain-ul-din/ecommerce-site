@@ -12,9 +12,6 @@ import {
     , Tbody 
     , Text 
     , Center 
-    , Stack 
-    , Input
-    , FormControl
     , Flex
     , NumberInput
     , NumberInputField
@@ -25,10 +22,11 @@ import {
 } 
 from "@chakra-ui/react"
 
-
 import {  InputField } from "../Helpers/InputHelpers"
-
 import Link from "next/link";
+import { CountryDropdown } from 'react-country-region-selector';
+
+
 
 export default function Order (props) {
   
@@ -47,9 +45,19 @@ export default function Order (props) {
     const loggedInUser = useContext (userContext)
     const [state , dispatch] = useReducer (  reducer ,{ data : {} , errors : {} } ) 
     
+    async function handleUploadOrder () {
+      // validation
+      if (context.products.length === 0) { return }
+       
+      let totalBill =  0
+      for (let product of context.products) totalBill += isNaN (parent(product.totalBill)) ? 0 : parent(product.totalBill)
+      
+      const order = { totalBill }
+    }
+
     useEffect (()=> {
-       // if (!loggedInUser.user) return  
-        dispatch ({type : 'userName' , payload : loggedInUser.user.name})
+        if (!loggedInUser.user) return  
+      //  dispatch ({type : 'userName' , payload : loggedInUser.user.name})
     } , [])
     
     return (
@@ -119,6 +127,7 @@ function OrderMeta ({product , context}) {
         context.dispatch ({type : 'Update' , payload : { id : product.id , totalBill : isNaN(product.qt * product.price) ? 0 : product.qt * product.price  , qt }})
     } , [product])
       
+    
     useEffect (()=> {
         if (product.qt) {
          let qt = parseInt (product.qt)
@@ -179,6 +188,8 @@ export function CheckOutForm ({state , dispatch}) {
          state = {state}
          dispatch = {dispatch}
        />
+       
+       <CountryDropdown />
       </Flex>
     </>
    )

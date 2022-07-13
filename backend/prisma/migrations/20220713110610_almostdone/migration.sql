@@ -23,7 +23,7 @@ CREATE TABLE `Category` (
     `superCategoryName` VARCHAR(256) NOT NULL,
     `superCategory_id` INTEGER NOT NULL,
 
-    UNIQUE INDEX `Category_id_superCategory_id_name_key`(`id`, `superCategory_id`, `name`),
+    UNIQUE INDEX `Category_name_superCategoryName_key`(`name`, `superCategoryName`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -87,6 +87,48 @@ CREATE TABLE `Reply` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `OrderItem` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `qt` INTEGER NOT NULL,
+    `name` VARCHAR(256) NOT NULL,
+    `price` DECIMAL(65, 30) NOT NULL,
+    `product_id` INTEGER NOT NULL,
+    `order_id` INTEGER NOT NULL,
+    `totalBill` DECIMAL(65, 30) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ShippingAddress` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userName` VARCHAR(256) NOT NULL,
+    `address` MEDIUMTEXT NOT NULL,
+    `postalCode` INTEGER NOT NULL,
+    `city` VARCHAR(191) NOT NULL,
+    `country` VARCHAR(191) NOT NULL,
+    `order_id` INTEGER NOT NULL,
+
+    UNIQUE INDEX `ShippingAddress_order_id_key`(`order_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Order` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `paymentMethod` ENUM('CashOnDelivery') NOT NULL DEFAULT 'CashOnDelivery',
+    `totalBill` DECIMAL(65, 30) NOT NULL,
+    `tax` DECIMAL(65, 30) NOT NULL DEFAULT 0,
+    `shippingPrice` DECIMAL(65, 30) NOT NULL DEFAULT 0,
+    `isPaid` BOOLEAN NOT NULL DEFAULT false,
+    `status` ENUM('Pending', 'Approved', 'Canceled') NOT NULL DEFAULT 'Pending',
+    `deliveredAt` VARCHAR(191) NOT NULL DEFAULT 'NULL',
+    `createdAt` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Category` ADD CONSTRAINT `Category_superCategory_id_fkey` FOREIGN KEY (`superCategory_id`) REFERENCES `SuperCategory`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -104,3 +146,9 @@ ALTER TABLE `Reply` ADD CONSTRAINT `Reply_user_id_fkey` FOREIGN KEY (`user_id`) 
 
 -- AddForeignKey
 ALTER TABLE `Reply` ADD CONSTRAINT `Reply_review_id_fkey` FOREIGN KEY (`review_id`) REFERENCES `Review`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShippingAddress` ADD CONSTRAINT `ShippingAddress_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

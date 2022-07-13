@@ -22,6 +22,7 @@ import { categoryRouter } from './routes/categoryRoutes.js'
 import { reviewRouter } from './routes/reviewRoutes.js'
 import { fileUploaderRouter } from './routes/fileUploaderRoutes.js'
 import { superCategoryRouter } from './routes/superCategoryRoutes.js'
+import { orderRouter } from './routes/orderRoutes.js'
 
 app
 .use(cors(
@@ -37,6 +38,7 @@ app
 .use ('/subcategory/' , categoryRouter)
 .use ('/review/' , reviewRouter)
 .use('/static/' , fileUploaderRouter)
+.use ('/order/' , orderRouter)
 
 // socket.io connection
 io.on ('connection' , (socket) => { 
@@ -45,6 +47,7 @@ io.on ('connection' , (socket) => {
 })
 
 const PORT = 8000
+
 // Listen to server
 server.listen(PORT , () => {
   console.log('Welcome to ecommerce apis')
