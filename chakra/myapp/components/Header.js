@@ -98,7 +98,7 @@ export default function WithSubnavigation() {
           top  = {0}
           left = {0}
           right = {0}
-          position = {navPos}
+         // position = {navPos}
           zIndex = {999}
           >
           

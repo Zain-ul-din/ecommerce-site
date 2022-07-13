@@ -18,19 +18,26 @@ import {
     , NumberInputStepper
     , NumberIncrementStepper
     , NumberDecrementStepper, 
-    Button
+    Button,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    Stack,
+    Box
 } 
 from "@chakra-ui/react"
 
-import {  InputField } from "../Helpers/InputHelpers"
+import {  InputField , TextInputField } from "../Helpers/InputHelpers"
 import Link from "next/link";
-import { CountryDropdown } from 'react-country-region-selector';
+
 
 
 
 export default function Order (props) {
-  
+    
     function reducer (state , action) {
+     // userName , address , addressGoogle , postalCode , city , country , orderId  , email , contactNumber 
      switch (action.type) {
       case 'userName':
           return {
@@ -38,6 +45,42 @@ export default function Order (props) {
               , data : {...state.data , userName : action.payload} 
               , errors : {...state.errors , userName : {error : action.payload.length > 2 ? undefined : '🤯' , message : 'Name is too short' }}
           }
+      case 'country':
+        return {
+          ...state 
+         , data : {...state.data , country : action.payload} 
+         , errors : {...state.errors , country : {error :  undefined  , message : '' }}
+        }  
+      case 'city':
+        return {
+          ...state 
+         , data : {...state.data , city : action.payload} 
+         , errors : {...state.errors , city : {error : action.payload.length > 2 ? undefined : '🤯' , message : 'City name is too short' }}
+        }  
+      case 'address':
+        return {
+          ...state 
+         , data : {...state.data , address : action.payload} 
+         , errors : {...state.errors , address : {error : action.payload.length >= 10 ? undefined : '🤯' , message : `${10 - action.payload.length} more to go` }}
+        } 
+      case 'postalCode':
+        return {
+          ...state 
+         , data : {...state.data , postalCode : action.payload} 
+         , errors : {...state.errors , postalCode : {error : action.payload.length > 3 ? undefined : '🤯' , message : 'Invalid postal Code' }}
+        } 
+      case 'contactNumber':
+        return {
+          ...state 
+         , data : {...state.data , contactNumber : action.payload} 
+         , errors : {...state.errors , contactNumber : {error : action.payload.length === 11 ? undefined : '🤯' , message : 'Contact Number seems like invalid' }}
+        }  
+      case 'email':
+        return {
+          ...state 
+         , data : {...state.data , email : action.payload} 
+         , errors : {...state.errors , email : {error : undefined  , message : 'Contact Number seems like invalid' }}
+        }   
      }
     }
     
@@ -45,6 +88,8 @@ export default function Order (props) {
     const loggedInUser = useContext (userContext)
     const [state , dispatch] = useReducer (  reducer ,{ data : {} , errors : {} } ) 
     
+    console.log (state)
+
     async function handleUploadOrder () {
       // validation
       if (context.products.length === 0) { return }
@@ -52,12 +97,17 @@ export default function Order (props) {
       let totalBill =  0
       for (let product of context.products) totalBill += isNaN (parent(product.totalBill)) ? 0 : parent(product.totalBill)
       
-      const order = { totalBill }
+      const userId = loggedInUser.user.id
+
+      const order = { totalBill , userId }
+      const orderItems = context.products
+      
     }
 
     useEffect (()=> {
         if (!loggedInUser.user) return  
       //  dispatch ({type : 'userName' , payload : loggedInUser.user.name})
+         dispatch ({type : 'country' , payload : 'Pakistan'})
     } , [])
     
     return (
@@ -174,23 +224,85 @@ function OrderMeta ({product , context}) {
     )
 }
 
+import { countryList } from "../Helpers/constants";
+import { ChevronDownIcon } from '@chakra-ui/icons'
+
 export function CheckOutForm ({state , dispatch}) {
        
   return (
     <>
       <Center><Text fontSize={'2xl'} fontWeight = {'bold'} mt = {5} fontFamily = {'monospace'}>ORDER DETAILS</Text></Center>
-      <Flex p = {5}>
-       <InputField 
-         name = 'userName'
-         type= {'text'}
-         label = {'Enter your full name'}
-         helperText = {''}
-         state = {state}
-         dispatch = {dispatch}
-       />
-       
-       <CountryDropdown />
-      </Flex>
+     
+
+      <Stack>
+        <Center>
+         <InputField 
+           name = 'userName'
+           type= {'text'}
+           label = {'Enter your full name*'}
+           helperText = {''}
+           state = {state}
+           dispatch = {dispatch}
+         />
+        </Center>
+        
+        <Center>
+          <InputField 
+           name = 'city'
+           type= {'text'}
+           label = {'Enter your city name*'}
+           helperText = {''}
+           state = {state}
+           dispatch = {dispatch}
+          />
+         </Center>
+        
+        <Center>
+         <TextInputField 
+          name = 'address'
+          type = {'text'}
+          label = {'Enter full Address*'}
+          helperText = {'enter your full address so we can easily find you'}
+          state = {state}
+          dispatch = {dispatch}
+         />
+        </Center>
+
+        <Center>
+          <InputField 
+            name = 'postalCode'
+            type = {'number'}
+            label = {'Enter Postal Code (optional)'}
+            state = {state}
+            dispatch = {dispatch}
+          />
+        </Center>
+
+        <Center>
+          <InputField 
+            name = 'contactNumber'
+            type = {'number'}
+            label = {'Enter Contact Number*'}
+            state = {state}
+            dispatch = {dispatch}
+          />
+        </Center>
+
+         <Center>
+        <Menu computePositionOnMount = {false}  direction = {'ltr'} isLazy mb = {10}>
+          <MenuButton> 
+            <Button>Country : {state.data.country} <ChevronDownIcon/> </Button>
+         </MenuButton>
+         <MenuList position={'fixed'} maxH = {'30vh'} overflowY = {'scroll'} onScroll = {()=> {}}>
+          {countryList && countryList.map ( (country , idx ) => <MenuItem  key = {idx}
+          onClick = {(e)=> dispatch ({type : 'country' , payload : country})}
+          >{country}</MenuItem>)}
+         </MenuList>
+         </Menu>
+        </Center>
+      </Stack>
+      <Flex mt = {10} />
+      
     </>
    )
 }

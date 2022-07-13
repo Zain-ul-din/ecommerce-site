@@ -9,15 +9,30 @@ const prisma = new PrismaClient()
 async function postOrder (req , res) {
 
     try {
-        
-       const { order } = req.body
+
+       const { order , orderItems } = req.body
        
        // post order
-      // Order => {totalBill , deliveredAt , createdAt }
+      // Order => {totalBill }
        const postOrder = await prisma.order.create ({
+         user_id : order.userId , 
          totalBill : order.totalBill ,
          createdAt : new Date().toString () ,
          deliveredAt : "NULLL" 
+       })
+       
+       const orderId = parseInt(postOrder.id)
+       
+       // Order Items => { qt , name , price , product_id , order_id , totalBill }
+       orderItems.forEach ( async (product) => {
+         const res = await prisma.orderItem.create ({
+            name : product.name ,
+            qt : parseInt(product.qt) ,
+            price : parseFloat (product.price) ,
+            product_id : parseInt(product.id) ,
+            order_id : orderId ,
+            totalBill : parseFloat (product.totalBill)
+         })
        })
        
        res.send ({...RESPONSE ,
