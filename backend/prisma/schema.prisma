@@ -181,7 +181,7 @@ model Order {
    isPaid Boolean @default (false)
    status OrderStatus @default(Pending)
    deliveredAt String 
-   createdAt String
+   createdAt String 
    shippingAddress ShippingAddress @relation(fields: [shippingAddress_id] , references: [id])
    shippingAddress_id Int
    orderItems OrderItem []

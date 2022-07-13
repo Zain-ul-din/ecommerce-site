@@ -1,4 +1,5 @@
-import React, { useReducer , useEffect , useState }  from "react";
+import React, { useReducer , useEffect , useContext} from "react";
+import { cartContext } from "../Hooks/RandomsHooks";
 
 import { 
       Grid 
@@ -28,20 +29,38 @@ import {  InputField } from "../Helpers/InputHelpers"
 import Link from "next/link";
 
 export default function Order (props) {
+  
+    function reducer (state , action) {
+     switch (action.type) {
+      case 'userName':
+          return {
+               ...state 
+              , data : {...state.data , userName : action.payload} 
+              , errors : {...state.errors , userName : {error : action.payload.length > 2 ? undefined : '🤯' , message : 'Name is too short' }}
+          }
+     }
+    }
+    
+    const context = useContext (cartContext)
+    const [state , dispatch] = useReducer (  reducer ,{ data : {} , errors : {} } ) 
+
+    console.debug (state)
+
     return (
       <>
-        Cart
-        <OrderDetails />
-        <CheckOutForm/>
+        <OrderDetails products = {context.products} cart = {context}/>
+        <CheckOutForm state={state} dispatch = {dispatch}/>
       </>
     )
 }
 
 export function OrderDetails (props) {
     
-    // console.log (props.cart)
+    
     return ( 
-    <> <Grid  gridAutoFlow={'column'} 
+    <> 
+    <Center><Text fontSize={'2xl'} fontWeight = {'bold'} mt = {5} fontFamily = {'monospace'}>ORDER</Text></Center>
+    <Grid  gridAutoFlow={'column'} 
          mt = {2}
          gap = {1}
          p = {2}
@@ -140,28 +159,16 @@ function OrderMeta ({product , context}) {
     )
 }
 
-export function CheckOutForm () {
-   
-   function reducer (state , action) {
-      switch (action.type) {
-        case 'userName':
-            return {
-                 ...state 
-                , data : {...state.data , userName : action.payload} 
-                , errors : {...state.errors , userName : {error : action.payload.length > 2 ? undefined : '🤯' , message : 'Name is too short' }}
-            }
-      }
-   }
-   
-   const [state , dispatch] = useReducer (  reducer ,{ data : {} , errors : {} } ) 
-   
-   return (
+export function CheckOutForm ({state , dispatch}) {
+       
+  return (
     <>
+      <Center><Text fontSize={'2xl'} fontWeight = {'bold'} mt = {5} fontFamily = {'monospace'}>ORDER DETAILS</Text></Center>
       <Flex p = {5}>
        <InputField 
          name = 'userName'
          type= {'text'}
-         label = {'Enter your name'}
+         label = {'Enter your full name'}
          helperText = {''}
          state = {state}
          dispatch = {dispatch}
