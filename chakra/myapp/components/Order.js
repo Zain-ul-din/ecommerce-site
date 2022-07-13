@@ -1,5 +1,6 @@
 import React, { useReducer , useEffect , useContext} from "react";
-import { cartContext } from "../Hooks/RandomsHooks";
+import { cartContext  } from "../Hooks/RandomsHooks";
+import { userContext } from '../Hooks/Context'
 
 import { 
       Grid 
@@ -24,6 +25,7 @@ import {
 } 
 from "@chakra-ui/react"
 
+
 import {  InputField } from "../Helpers/InputHelpers"
 
 import Link from "next/link";
@@ -42,10 +44,14 @@ export default function Order (props) {
     }
     
     const context = useContext (cartContext)
+    const loggedInUser = useContext (userContext)
     const [state , dispatch] = useReducer (  reducer ,{ data : {} , errors : {} } ) 
-
-    console.debug (state)
-
+    
+    useEffect (()=> {
+       // if (!loggedInUser.user) return  
+        dispatch ({type : 'userName' , payload : loggedInUser.user.name})
+    } , [])
+    
     return (
       <>
         <OrderDetails products = {context.products} cart = {context}/>
