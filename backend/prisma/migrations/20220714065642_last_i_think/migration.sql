@@ -104,11 +104,14 @@ CREATE TABLE `OrderItem` (
 CREATE TABLE `ShippingAddress` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userName` VARCHAR(256) NOT NULL,
+    `addressGoogle` MEDIUMTEXT NOT NULL,
     `address` MEDIUMTEXT NOT NULL,
     `postalCode` INTEGER NOT NULL,
     `city` VARCHAR(191) NOT NULL,
     `country` VARCHAR(191) NOT NULL,
     `order_id` INTEGER NOT NULL,
+    `email` VARCHAR(256) NOT NULL,
+    `contactNumber` VARCHAR(11) NOT NULL,
 
     UNIQUE INDEX `ShippingAddress_order_id_key`(`order_id`),
     PRIMARY KEY (`id`)
@@ -117,6 +120,7 @@ CREATE TABLE `ShippingAddress` (
 -- CreateTable
 CREATE TABLE `Order` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
     `paymentMethod` ENUM('CashOnDelivery') NOT NULL DEFAULT 'CashOnDelivery',
     `totalBill` DECIMAL(65, 30) NOT NULL,
     `tax` DECIMAL(65, 30) NOT NULL DEFAULT 0,

@@ -164,16 +164,18 @@ model OrderItem {
 
 model ShippingAddress {
   id Int @id @default(autoincrement())
+  user_id Int
   userName String @db.VarChar(256)
   addressGoogle String @db.MediumText 
   address String @db.MediumText
   postalCode  Int
   city String
   country String
-  order Order @relation(fields: [order_id] , references: [id] , onDelete: Cascade , onUpdate: Cascade)
-  order_id Int @unique
+  orderId Int @unique
   email String @db.VarChar(256) 
   contactNumber String @db.VarChar (11)
+  
+  order Order @relation(fields: [orderId] , references: [id] , onDelete: Cascade , onUpdate: Cascade)
 }
 
 model Order {
@@ -187,8 +189,8 @@ model Order {
    status OrderStatus @default(Pending)
    deliveredAt String @default("NULL")
    createdAt String 
-
-   shippingAddress ShippingAddress ? 
+   
+   shippingAddress ShippingAddress?  
    orderItems OrderItem []
 }
 

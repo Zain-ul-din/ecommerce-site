@@ -599,6 +599,11 @@ const NAV_ITEMS = [
           href: '/admin/products/',
           categories : []
         },
+        {
+          name : 'Check Order' ,
+          href : '/admin/orders',
+          categories : []
+        }
       ],
     },
 ];
