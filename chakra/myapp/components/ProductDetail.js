@@ -17,27 +17,16 @@ import {
     ListItem,
     Badge,
     Tooltip,
-    Editable,
-    EditableInput,
-    EditableTextarea,
-    EditablePreview,
     Input,
     Avatar,
     Center,
     FormControl,
     IconButton,
     Divider,
-    Drawer,
-    DrawerOverlay,
-    DrawerContent,
-    DrawerHeader,
-    DrawerBody,
-    Textarea ,
-    Collapse ,
-    Slide
+    useToast
 } from '@chakra-ui/react';
 
-import { useReducer, useState , useContext } from 'react'
+import { useReducer, useState , useContext, useEffect } from 'react'
 import { SearchIcon } from '@chakra-ui/icons'
 import { MdLocalShipping } from 'react-icons/md'
 import { RatingComponent } from './Products'
@@ -45,19 +34,24 @@ import { BiClipboard } from 'react-icons/bi'
 import { InputField , TextInputField  } from '../Helpers/InputHelpers'
 
 import { cartContext } from '../Hooks/RandomsHooks'
+import {userContext} from '../Hooks/Context'
+
+import {useHttpie as superPower} from '../Hooks/RandomsHooks'
+import {Toaster} from '../Helpers/Toaster'
 
 // Comment Component
-function CommentsComponent ( ) {
+function CommentsComponent ({review}) {
+
   return (
     <>
        <Flex p = {5} flexDirection = 'column' w= {'100%'}>
         <Stack>
         <Stack direction={'row'} spacing = {3}>
-          <Avatar name='Dan Abrahmov' src='https://bit.ly/dan-abramov' />
+          <Avatar name={`${review.userName}`} src='https://bit.ly/broken-link' />
           <Stack spacing = {0}>
-            <Text pt = {2} fontSize = {'1xl'}>Zain Ul Din Zafar</Text>
+            <Text pt = {2} fontSize = {'1xl'}>{review.userName}</Text>
             <Stack direction={'row'} >
-              <RatingComponent rating={0}/>
+              <RatingComponent rating={review.rating}/>
               <Text fontSize={'xs'} fontWeight = {'bold'} color = {'blue.400'}>Sun Jun 26 2022 05:15:28</Text>
             </Stack>
           </Stack>
@@ -65,7 +59,7 @@ function CommentsComponent ( ) {
         </Stack>
         <Stack direction={'row'} spacing = {0}>
           <Text px = {8} py = {1} pl = {{lg : 14 , base : 14}} fontSize = {{lg : '1xl' , sm : 'md' , base : 'xs'}}>
-          belive me this course is amazing i was backend developer with laravel for two years and now im looking to something to entertain myself so i decided to choose game development and i took courses before this couse and none of them helped me to understand it in detail but this course is amazing and thank you mr. im so glad that i find you at the end again and again thank you so much i love you
+          {review.comment}
           </Text>
         </Stack>
        </Flex>
@@ -75,10 +69,12 @@ function CommentsComponent ( ) {
 
 // Comment Component Upload
 function ReviewUploadComponent ({
-  userId , productId 
+  userId , productId , userName , reviews , setReviews
 }) { 
 
   const clamp = (val , min , max ) => ( val < min ) ? min : ( val > max ) ? max : val
+
+  const toast = useToast ()
 
   function reducer (state , action) {
      switch (action.type) {
@@ -102,16 +98,35 @@ function ReviewUploadComponent ({
 
   const [state , dispatch] = useReducer (reducer , {data : {} , errors : {}})
   
-  function handleUpload () {
-    try {
-        
-    } catch (e) {
-      
+  async function handleUpload () {
+    const {errors} = state
+
+    if (Object.entries (errors).length < 2) {
+      Toaster (toast , 'Some input fields are missing' , 'error')
+      return
     }
+    
+    for (let [key , val] of Object.entries (errors))
+       if (val.error !== undefined){
+        Toaster (toast , 'Some input fields are invalid' , 'error')
+        return
+      }
+
+    const res  = await superPower (`${process.env.NEXT_PUBLIC_SERVER_URL}/review/` , 'POST' , {
+      review : {
+        user_id: userId ,
+        product_id : productId ,
+        rating : state.data.rating ,
+        comment : state.data.comment, 
+        userName : userName
+      }
+    }) 
+
+    
+    setReviews ([res.data.data , ...reviews])
+    Toaster (toast , 'upload success' , 'success')
   }
-
   
-
   return (
     <>
     
@@ -150,7 +165,9 @@ function ReviewUploadComponent ({
         />
           
         <Center pb = {3} >
-           <Button colorScheme={'whatsapp' } >{ `Add Review`  } </Button>
+           <Button colorScheme={'whatsapp' } 
+           onClick = {()=>handleUpload()}
+           >{ `Add Review`  } </Button>
         </Center>
       </Flex>
      
@@ -163,6 +180,18 @@ export default function ProductDetail (
 ) {
     
   const addToCart = useContext (cartContext)
+  const activeUser = useContext (userContext)
+  const [reviews , setReviews] = useState ([])
+  const [searchVal , setSearchVal ] = useState('')
+
+  useEffect (()=>{
+     setReviews (product.reviews)
+  } , [product])
+  
+  const filterReviews = reviews.filter (rev => 
+    rev.userName.toLowerCase().includes(searchVal) || rev.comment.toLowerCase().includes(searchVal) && product.id === rev.product_id)
+  
+  
 
   return (
       <>
@@ -330,23 +359,29 @@ export default function ProductDetail (
              mb = {1}
             >
               <FormControl>
-              <Input type={'text'} placeholder = {'Search Reviews'} display = {'block'} />
+              <Input type={'text'} placeholder = {'Search Reviews'} display = {'block'} value = {searchVal} onChange = {(e)=> setSearchVal (e.target.value.toLowerCase())} />
               </FormControl>
               
                <IconButton aria-label='Search database' colorScheme={'twitter'} icon={<SearchIcon />} mx = {2} />
               
       </Container>
-      
-
-    <ReviewUploadComponent userId={1} productId = {product.id} />
-
-    <Flex px = {{lg : 12 , md : 9 , sm : 5 , base : 1}} flexWrap = {'wrap'} justifyContent = {'center'}>
-        <CommentsComponent/>
-        <CommentsComponent/>
-        <CommentsComponent/>
+    
+    {activeUser.user && !product.reviews.find ( rev => rev.user_id === activeUser.user.id )  ?   
+    <ReviewUploadComponent 
+      productId = {product.id} 
+      userId = {activeUser.user.id} 
+      userName = {activeUser.user.name} 
+      setReviews = {setReviews}
+      reviews = {reviews}
+    />
+    : <> </>}
+    
+    <Flex px = {{lg : 50 , md : 15 , sm : 5 , base : 1}} flexWrap = {'wrap'} justifyContent = {'center'}>
+        {filterReviews && filterReviews.slice(0 , 3).map ( (val , key) => <CommentsComponent key = {key} review = {val}/>)}
       </Flex>
     <Divider />
     
+    <Flex my = {10} bg = {'white'}></Flex>
     </>
     );
   }

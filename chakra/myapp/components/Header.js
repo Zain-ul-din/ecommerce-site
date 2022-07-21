@@ -70,7 +70,6 @@ export default function WithSubnavigation() {
         handler: () => setUserModelState(false),
     })
     
-
     const [navPos , setNavPos] = useState ('flex')
     
     useEffect (()=> {
@@ -123,7 +122,7 @@ export default function WithSubnavigation() {
               color={useColorModeValue('gray.800', 'white')}
               pl = {{lg : 4 , md : 3}}
               >
-              RTX SHOP
+             E-STORE
             </Text>
         </Linker>  
 

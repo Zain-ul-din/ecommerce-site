@@ -81,10 +81,11 @@ export default function Footer() {
             spacing={8}>
             <Stack spacing={6}>
               <Box>
-                <Logo color={useColorModeValue('gray.700', 'white')} />
+            {/* <Logo color={useColorModeValue('gray.700', 'white')} /> */}
+                <Text fontSize={'2xl'} fontWeight = {'black'} fontFamily = {'sans-serif'}>E-STORE</Text>
               </Box>
               <Text fontSize={'sm'}>
-                © 2022 Chakra Templates. All rights reserved
+                © 2022 E-STORE. All rights reserved
               </Text>
               <Stack direction={'row'} spacing={6}>
                 <SocialButton label={'Twitter'} href={'#'}>

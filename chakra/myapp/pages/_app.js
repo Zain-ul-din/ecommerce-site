@@ -6,8 +6,6 @@ import { userContext , categoriesContext } from '../Hooks/Context'
 import { cookieName } from '../Helpers/constants'
 import { getUserByToken } from '../Helpers/Auth'
 
-// redux 
-import { Provider } from 'react-redux'
 
 import Header from '../components/Header'
 import { useHttpie as power , cartContext , useCart} from '../Hooks/RandomsHooks'

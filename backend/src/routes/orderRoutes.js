@@ -26,6 +26,7 @@ async function postOrder (req , res) {
        
        // Order Items => { qt , name , price , product_id , order_id , totalBill }
       orderItems.forEach ( async (product) => {
+
          const res = await prisma.orderItem.create ({
           data : {
             name : product.name ,
@@ -34,7 +35,17 @@ async function postOrder (req , res) {
             product_id : parseInt(product.id) ,
             order_id : orderId ,
             totalBill : parseFloat (product.totalBill)
-         }})
+        }})
+
+        // update product also
+        const _product = await prisma.product.findUnique ({ where : { id : parseInt(product.id )} })
+
+        const newQt = parseInt(_product.countInStock) - parseInt(product.qt)
+        
+        await prisma.product.update ({where : {id : parseInt(product.id) } , data : {
+          countInStock : newQt < 0 ? 0 : newQt
+        }})
+
       })
        
       const orderDetail = await prisma.shippingAddress.create ({ 

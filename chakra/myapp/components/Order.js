@@ -314,7 +314,7 @@ function OrderMeta ({product , context , mode}) {
               <Button colorScheme={'red'} onClick = {(e)=>{
                 e.stopPropagation ()
                 context.dispatch ({type : 'Delete' , payload : {id : product.id}})
-              }}>Delete</Button>
+              }}>Remove</Button>
             </Th> }
         </Tr> 
     )

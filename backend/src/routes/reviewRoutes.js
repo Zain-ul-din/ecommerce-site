@@ -32,6 +32,7 @@ async function post (req , res) {
     review = typeof review !== 'object' ? {} : review
     let error = null
     
+
     const userName = await prisma.user.findUnique ({where : {id : parseInt(review.user_id)}}).catch(e=>e)
     
     const newReview = await prisma.review.create ({

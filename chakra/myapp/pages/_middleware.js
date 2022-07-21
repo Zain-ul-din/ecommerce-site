@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 import getUserAuth from '../Helpers/Auth'
 import { cookieName } from '../Helpers/constants'
 
-const userPages = [] //['/user/profile' , '/user/orders' , '/user/cart' , '/user/checkout'  ]
-const stuffPages =  [] //['/product/upload' , '/category/upload' , '/admin/orders']
-const adminPages = [] //['/admin/users' , '/admin/products']
-const adminDynamicPages = [] //['/user/update/' , '/product/upload']
+const userPages = ['/user/profile' , '/user/orders' , '/user/cart' , '/user/checkout'  ]
+const stuffPages =  ['/product/upload' , '/category/upload' , '/admin/orders']
+const adminPages = ['/admin/users' , '/admin/products']
+const adminDynamicPages = ['/user/update/' , '/product/upload']
 
 export default function middleware (req) {
     

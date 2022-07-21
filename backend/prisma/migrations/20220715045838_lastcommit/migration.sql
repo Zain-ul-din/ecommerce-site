@@ -103,17 +103,18 @@ CREATE TABLE `OrderItem` (
 -- CreateTable
 CREATE TABLE `ShippingAddress` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
     `userName` VARCHAR(256) NOT NULL,
     `addressGoogle` MEDIUMTEXT NOT NULL,
     `address` MEDIUMTEXT NOT NULL,
     `postalCode` INTEGER NOT NULL,
     `city` VARCHAR(191) NOT NULL,
     `country` VARCHAR(191) NOT NULL,
-    `order_id` INTEGER NOT NULL,
+    `orderId` INTEGER NOT NULL,
     `email` VARCHAR(256) NOT NULL,
     `contactNumber` VARCHAR(11) NOT NULL,
 
-    UNIQUE INDEX `ShippingAddress_order_id_key`(`order_id`),
+    UNIQUE INDEX `ShippingAddress_orderId_key`(`orderId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -155,4 +156,4 @@ ALTER TABLE `Reply` ADD CONSTRAINT `Reply_review_id_fkey` FOREIGN KEY (`review_i
 ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ShippingAddress` ADD CONSTRAINT `ShippingAddress_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `ShippingAddress` ADD CONSTRAINT `ShippingAddress_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

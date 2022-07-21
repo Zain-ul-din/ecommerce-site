@@ -81,3 +81,10 @@ export default function UserDashBoard (props) {
     )
 }
 
+export function OrderDetail (props) {
+  return (
+    <>
+    </>
+  )
+}
+
