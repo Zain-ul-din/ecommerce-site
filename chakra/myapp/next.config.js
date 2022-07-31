@@ -2,8 +2,6 @@
 
 require('dotenv').config()
 
-
-
 const nextConfig = {
   reactStrictMode: false,
   images: {
