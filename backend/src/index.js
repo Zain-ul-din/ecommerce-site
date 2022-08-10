@@ -1,58 +1,60 @@
-import express from "express"
-import cors from 'cors'
-import bp from 'body-parser'
-import { parserErrorHandler } from './middlewares/customMiddleWare.js'
-const { json , urlencoded } = bp
+import express from "express";
+import cors from "cors";
+import bp from "body-parser";
+import { parserErrorHandler } from "./middlewares/customMiddleWare.js";
+const { json, urlencoded } = bp;
 
-const app = express()
+const app = express();
 
 // socket.io
 
-import http from 'http'
-import { Server } from "socket.io"
+import http from "http";
+import { Server } from "socket.io";
 
-const server = http.createServer (app)
-const io = new Server (server , {
-  cors : {origin : "*"}
-})
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: "*" },
+});
 
-import {  userRouter } from './routes/userRoutes.js'
-import { productRouter } from './routes/productRoutes.js'
-import { categoryRouter } from './routes/categoryRoutes.js'
-import { reviewRouter } from './routes/reviewRoutes.js'
-import { fileUploaderRouter } from './routes/fileUploaderRoutes.js'
-import { superCategoryRouter } from './routes/superCategoryRoutes.js'
-import { orderRouter } from './routes/orderRoutes.js'
+import { userRouter } from "./routes/userRoutes.js";
+import { productRouter } from "./routes/productRoutes.js";
+import { categoryRouter } from "./routes/categoryRoutes.js";
+import { reviewRouter } from "./routes/reviewRoutes.js";
+import { fileUploaderRouter } from "./routes/fileUploaderRoutes.js";
+import { superCategoryRouter } from "./routes/superCategoryRoutes.js";
+import { orderRouter } from "./routes/orderRoutes.js";
 
 app
-.use(cors(
-  {credentials: true, origin: 'http://localhost:3000'}
-))
-.use(json())
-.use(urlencoded({extended : true}))
-//.use(express.static(__dirname))
-.use(parserErrorHandler) // error hanlder
-.use('/user/' , userRouter)
-.use ('/product/' , productRouter)
-.use ('/category/' , superCategoryRouter)
-.use ('/subcategory/' , categoryRouter)
-.use ('/review/' , reviewRouter)
-.use('/static/' , fileUploaderRouter)
-.use ('/order/' , orderRouter)
+  .use(cors({ credentials: true, origin: "http://localhost:3000" }))
+  .use(json())
+  .use(urlencoded({ extended: true }))
+  //.use(express.static(__dirname))
+  .use(parserErrorHandler) // error hanlder
+  .use("/user/", userRouter)
+  .use("/product/", productRouter)
+  .use("/category/", superCategoryRouter)
+  .use("/subcategory/", categoryRouter)
+  .use("/review/", reviewRouter)
+  .use("/static/", fileUploaderRouter)
+  .use("/order/", orderRouter);
 
 // socket.io connection
-io.on ('connection' , (socket) => { 
-  socket.on ('onProductChange' , message => { io.emit ('onProductChange' , message) })
-  socket.on ('onUserChange' , email => {io.emit ('onUserChange' , email)})
-})
+io.on("connection", (socket) => {
+  socket.on("onProductChange", (message) => {
+    io.emit("onProductChange", message);
+  });
+  socket.on("onUserChange", (email) => {
+    io.emit("onUserChange", email);
+  });
+});
 
-const PORT = 8000
+const PORT = 8000;
 
 // Listen to server
-server.listen(PORT , () => {
-  console.log('Welcome to ecommerce apis')
-  console.log(`server is running on port http://localhost:${PORT}/`)
-})
+server.listen(PORT, () => {
+  console.log("Welcome to ecommerce apis");
+  console.log(`server is running on port http://localhost:${PORT}/`);
+});
 
 // Routing
 
@@ -61,14 +63,13 @@ server.listen(PORT , () => {
 
 // install @prisma/client also
 // add seed script to package.JSON
-  // prisma : {"seed" : "node ./prisma/seed.js"}
-  // run : npx prisma db seed
+// prisma : {"seed" : "node ./prisma/seed.js"}
+// run : npx prisma db seed
 
 // PRISMA STUDIO
-// npx prisma studio 
+// npx prisma studio
 
-
-// HTTP 
+// HTTP
 
 /* 
  ** PRODUCT CRUD || HTTP REQ **
@@ -130,4 +131,3 @@ server.listen(PORT , () => {
     %URL%/category/update/:id  
   
 */
-

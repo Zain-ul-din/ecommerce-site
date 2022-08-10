@@ -1,39 +1,35 @@
 import { initializeApp } from "firebase/app";
-import { getAuth ,signInWithPopup , GoogleAuthProvider , signOut  , FacebookAuthProvider  }
-from "firebase/auth"
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  FacebookAuthProvider,
+} from "firebase/auth";
 import { cookieName } from "./constants";
-import Router from "next/router"
+import Router from "next/router";
+import firebaseConfig from "../firebase_key";
 
-export const firebaseConfig = {
-    apiKey: "AIzaSyCe6_Ulk0UZoJp23UPti1TOJpSHwKUiWOc",
-    authDomain: "ecommerce-50bbb.firebaseapp.com",
-    projectId: "ecommerce-50bbb",
-    storageBucket: "ecommerce-50bbb.appspot.com",
-    messagingSenderId: "422913168401",
-    appId: "1:422913168401:web:26cff9537a81dde17ecdb0",
-    measurementId: "G-Z37YQRHD48"
-};
+export const firebaseConfig = firebaseConfig; // add your firebase config here
 
-initializeApp(firebaseConfig)
+initializeApp(firebaseConfig);
 
-export const firebaseApp = initializeApp
+export const firebaseApp = initializeApp;
 
-export const auth = getAuth()
-export const SignOut = signOut
+export const auth = getAuth();
+export const SignOut = signOut;
 
 // sign up pop up
-export const SignInWithPopup = signInWithPopup
+export const SignInWithPopup = signInWithPopup;
 
 // Providers
 export const providers = {
-    google : new GoogleAuthProvider() ,
-    facebook : new FacebookAuthProvider() 
-}
+  google: new GoogleAuthProvider(),
+  facebook: new FacebookAuthProvider(),
+};
 
-export const SignOutUser  = (canReload = true) => {
-    signOut (getAuth())
-    document.cookie = cookieName + '=; Max-Age=-99999999;'
-    if (canReload) Router.push ('/')
-}
-
-
+export const SignOutUser = (canReload = true) => {
+  signOut(getAuth());
+  document.cookie = cookieName + "=; Max-Age=-99999999;";
+  if (canReload) Router.push("/");
+};

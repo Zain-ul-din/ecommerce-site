@@ -15,11 +15,11 @@
 //             isAdmin : user.isAdmin ,
 //             createdAt : new Date().toString() ,
 //             updatedAt : new Date().toString(),
-//             auth : user.auth ,            
+//             auth : user.auth ,
 //            }
 //          })
 //        })
-//     )   
+//     )
 // }
 
 // async function UploadCategoryData () {
@@ -80,7 +80,6 @@
 //     )
 // }
 
-
 // async function deleteUser () {
 //     await prisma.user.delete ({where : {id : 3}})
 // }
@@ -106,7 +105,7 @@
 // uploadUsersData()
 // .catch(err => {
 //     console.log(err)
-//     process.exit(1) // status code 1 
+//     process.exit(1) // status code 1
 // })
 
 // UploadReviews()

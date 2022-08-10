@@ -1,13 +1,11 @@
-import Order from "../../components/Order"
+import Order from "../../components/Order";
 
-export default function Orders () {
-    
+export default function Orders() {
   return (
-      <>
-        <Order />
-      </>        
-  )
-  
+    <>
+      <Order />
+    </>
+  );
 }
 
 // looking ok

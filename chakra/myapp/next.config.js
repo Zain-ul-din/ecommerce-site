@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 
-require('dotenv').config()
+require("dotenv").config();
 
 const nextConfig = {
   reactStrictMode: false,
   images: {
-    domains: ['localhost'],
+    domains: ["localhost"],
   },
   components: {
     Modal: {
@@ -16,7 +16,6 @@ const nextConfig = {
       },
     },
   },
-}
+};
 
-module.exports = nextConfig
-
+module.exports = nextConfig;

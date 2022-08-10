@@ -1,8 +1,10 @@
+import Order from "../../components/Order";
 
-import Order from "../../components/Order"
-
-export default function CheckOut () {
-   return (<> <Order /> </>)
-} 
-
-
+export default function CheckOut() {
+  return (
+    <>
+      {" "}
+      <Order />{" "}
+    </>
+  );
+}

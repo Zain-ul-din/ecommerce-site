@@ -1,8 +1,5 @@
+import { createStore } from "redux";
 
-import  { createStore } from 'redux'
+const reducer = (state, action) => {};
 
-const reducer = (state , action) => {
-    
-}
-
-const ecommerceStore = createStore (reducer) 
+const ecommerceStore = createStore(reducer);

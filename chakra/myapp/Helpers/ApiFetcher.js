@@ -1,16 +1,16 @@
-import axios from 'axios'
+import axios from "axios";
 
-export async function uploadFile (file , callBack) {
+export async function uploadFile(file, callBack) {
+  const url = "http://localhost:8000/static/";
+  let formData = new FormData();
+  formData.append("image_upload", file);
 
-    const url = 'http://localhost:8000/static/'
-    let formData = new FormData();
-    formData.append("image_upload", file);
-
-    const res = await axios.post(url , formData , {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    }).catch (err => err)
-    callBack(res.data)
+  const res = await axios
+    .post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .catch((err) => err);
+  callBack(res.data);
 }
-

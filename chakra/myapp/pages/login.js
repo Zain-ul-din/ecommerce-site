@@ -1,5 +1,5 @@
-import LoginForm from "../components/LoginForm"
+import LoginForm from "../components/LoginForm";
 
-const Login = () => <LoginForm mode={'signin'}/>
+const Login = () => <LoginForm mode={"signin"} />;
 
-export default Login
+export default Login;
