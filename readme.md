@@ -1,6 +1,6 @@
-#initial setup
+# Initial Setup
 
--- backend
+***Backend:-***
 > Add your database URL in .env file also change db provider in `prisma/schema.prisma` file
 
 ``` .env
@@ -18,9 +18,9 @@
 
 ```
 
-# start backend sever `npm start` OR `yarn start`
+### start backend sever `npm start` OR `yarn start`
 
--- front end
+***Front-end:-***
 
 > Add firebase_key.js in root directory form there export default your firebase config secret OR open Helper/firebase.js to edit
 
@@ -33,6 +33,6 @@ NEXT_PUBLIC_ANOTHER_SALT = '' # add salt
 
 ```
 
-# start front end `npm run dev` OR `yarn dev`
+### start front end `npm run dev` OR `yarn dev`
 
-# run `npm run format` OR `yarn format` to auto fromat all files
+### run `npm run format` OR `yarn format` to auto fromat all files
